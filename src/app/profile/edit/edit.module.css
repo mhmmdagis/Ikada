@@ -1,0 +1,367 @@
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.backBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f3f4f6;
+    color: #333;
+    text-decoration: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.backBtn:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.input,
+.textarea {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.hint {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.sectionTitle {
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.submitBtn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.submitBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: #f3f4f6;
+    color: #333;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    background: #e5e7eb;
+}
+
+.error,
+.success {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1.2rem;
+    color: #6b7280;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.avatarRow {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.avatarPreview {
+    width: 72px;
+    height: 72px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.avatarPreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatarPlaceholder {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.avatarControls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.avatarButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.avatarUploadBtn,
+.avatarGalleryBtn {
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.avatarUploadBtn:hover,
+.avatarGalleryBtn:hover {
+    background: #eef2ff;
+    border-color: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.gallery {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.galleryInfo {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.galleryError {
+    font-size: 0.85rem;
+    color: #b91c1c;
+    margin-bottom: 0.5rem;
+}
+
+.galleryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 0.5rem;
+}
+
+.galleryItem {
+    border: none;
+    padding: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    cursor: pointer;
+    background: transparent;
+}
+
+.galleryItem img {
+    width: 100%;
+    height: 72px;
+    object-fit: cover;
+    display: block;
+}
+
+.passwordMeta {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.passwordMeter {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.passwordMeterFill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.passwordWeak {
+    background: #f97373;
+}
+
+.passwordMedium {
+    background: #facc15;
+}
+
+.passwordStrong {
+    background: #22c55e;
+}
+
+.passwordLabelWeak {
+    font-size: 0.8rem;
+    color: #b91c1c;
+}
+
+.passwordLabelMedium {
+    font-size: 0.8rem;
+    color: #92400e;
+}
+
+.passwordLabelStrong {
+    font-size: 0.8rem;
+    color: #166534;
+}
+
+@media (max-width: 640px) {
+    .container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .header {
+        flex-wrap: wrap;
+    }
+
+    .header h1 {
+        width: 100%;
+        font-size: 1.5rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .submitBtn,
+    .cancelBtn {
+        width: 100%;
+    }
+
+    .avatarRow {
+        flex-direction: row;
+        align-items: center;
+    }
+}

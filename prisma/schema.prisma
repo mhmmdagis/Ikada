@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String        @id @default(cuid())
+  username               String        @unique
+  name                   String
+  email                  String        @unique
+  password               String
+  role                   String        @default("USER") // 'USER' or 'ADMIN'
+  bio                    String?
+  avatar                 String? // profile picture URL
+  instagram              String?
+  twitter                String?
+  linkedin               String?
+  emailVerified          Boolean       @default(false)
+  emailVerificationToken String?
+  passwordResetToken     String?
+  passwordResetExpires   DateTime?
+  articles               Article[]
+  forums                 Forum[]
+  comments               Comment[]
+  likes                  Like[]
+  galleryItems           GalleryItem[]
+  programs               Program[]
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  color     String    @default("#6366f1")
+  articles  Article[]
+  forums    Forum[]
+  createdAt DateTime  @default(now())
+}
+
+model Article {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  customSlug      String?   @unique
+  content         String
+  excerpt         String?
+  cover           String?
+  thumbnail       String? // cover/preview image for listings
+  published       Boolean   @default(false)
+  visibility      String    @default("PUBLIC") // PUBLIC, DRAFT, UNLISTED, PRIVATE
+  scheduledAt     DateTime? // for future publishing
+  allowComments   Boolean   @default(true)
+  anonymous       Boolean   @default(false) // hide author, show "Anonim"
+  views           Int       @default(0)
+  authorId        String
+  author          User      @relation(fields: [authorId], references: [id])
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id])
+  tags            String[]  @default([]) // simple array of tag names
+  attachments     String[]  @default([]) // urls or identifiers of attached files
+  metaTitle       String?
+  metaDescription String?
+  likes           Like[]
+  comments        Comment[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Forum {
+  id         String    @id @default(cuid())
+  title      String
+  content    String
+  views      Int       @default(0)
+  pinned     Boolean   @default(false)
+  authorId   String
+  author     User      @relation(fields: [authorId], references: [id])
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  comments   Comment[]
+  likes      Like[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  forumId   String?
+  forum     Forum?   @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  articleId String?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  content     String?
+  date        DateTime
+  endDate     DateTime?
+  location    String
+  image       String?
+  type        String    @default("ONLINE") // ONLINE, OFFLINE, HYBRID
+  status      String    @default("UPCOMING") // UPCOMING, ONGOING, ENDED
+  organizer   String?
+  link        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  forumId   String?
+  forum     Forum?   @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@unique([userId, forumId])
+}
+
+model GalleryItem {
+  id           String   @id @default(cuid())
+  url          String
+  category     String?
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model GalleryCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Program {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  content     String?
+  image       String?
+  icon        String?
+  category    String? // e.g., "Sosial", "Pengembangan", "Edukasi"
+  status      String   @default("ACTIVE") // ACTIVE, INACTIVE, ARCHIVED
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

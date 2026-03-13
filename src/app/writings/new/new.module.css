@@ -1,0 +1,437 @@
+.page {
+    padding: 0 0 4rem;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary) !important;
+    transition: color var(--ease-fast);
+}
+
+.backLink:hover {
+    color: var(--brand-primary) !important;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .layout {
+        grid-template-columns: 1fr 280px;
+    }
+}
+
+/* Form Header */
+.main {}
+
+.formHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.formHeaderIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: var(--gradient-main);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.formTitle {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.formSub {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.errorAlert {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(239, 68, 68, .08);
+    border: 1px solid rgba(239, 68, 68, .2);
+    border-radius: var(--radius-md);
+    color: var(--error);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.textareaFooter {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.formActions {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+}
+
+/* Editor toolbar */
+.editorToolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: #f5f5f5;
+    border: 1px solid var(--border-light);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    flex-wrap: wrap;
+}
+
+.toolbarBtn {
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.toolbarBtn:hover {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
+}
+
+.toolbarBtn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.toolbarBtnText {
+    margin-left: 0.35rem;
+    font-weight: 700;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.toolbarSeparator {
+    width: 1px;
+    height: 24px;
+    background: #ddd;
+    margin: 0 0.25rem;
+}
+
+/* Thumbnail preview */
+.thumbnailPreview {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #f6f6f6;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* gallery */
+.gallerySection {
+    margin-top: 1rem;
+}
+.galleryTitle {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+.galleryGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.galleryThumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+}
+.galleryThumb:hover {
+    border-color: var(--brand-primary);
+}
+
+.thumbnailPreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.removeThumbnail {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.removeThumbnail:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.uploadLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f9f9f9;
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.uploadLabel:hover {
+    border-color: var(--brand-primary);
+    background: rgba(99, 102, 241, 0.05);
+    color: var(--brand-primary);
+}
+
+/* editor type toggles */
+.editorToggle {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+.editorToggle label {
+
+/* markdown preview area */
+.previewSection {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #fafafa;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+}
+.previewSection h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+.markdownPreview {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* next rules still editorToggle */
+.editorToggle label {
+    cursor: pointer;
+}
+.editorToggle input {
+    margin-right: 0.25rem;
+}
+
+.hybridEditor {
+    display: flex;
+    gap: 1rem;
+}
+
+.preview {
+    background: #fafafa;
+    padding: 0.75rem;
+    overflow: auto;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+}
+
+/* Sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sideCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+}
+
+.sideTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.tipsList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+/* Modal gallery picker */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 50;
+}
+
+.modal {
+    width: min(920px, 100%);
+    max-height: min(80vh, 720px);
+    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.modalHeader {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.modalTitle {
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.modalSub {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.modalClose {
+    border: 1px solid var(--border-light);
+    background: transparent;
+    border-radius: 10px;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.modalClose:hover {
+    color: var(--text-primary);
+    border-color: var(--brand-primary);
+}
+
+.modalError {
+    margin: 1rem 1.25rem 0;
+    padding: 0.75rem 1rem;
+    background: rgba(239, 68, 68, .08);
+    border: 1px solid rgba(239, 68, 68, .2);
+    border-radius: var(--radius-md);
+    color: var(--error);
+    font-size: 0.875rem;
+}
+
+.modalLoading,
+.modalEmpty {
+    padding: 1.25rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modalGrid {
+    padding: 1rem 1.25rem;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.modalThumbBtn {
+    border: 1px solid var(--border-light);
+    background: transparent;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0;
+    aspect-ratio: 1 / 1;
+}
+
+.modalThumbBtn:hover {
+    border-color: var(--brand-primary);
+}
+
+.modalThumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.modalFooter {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}

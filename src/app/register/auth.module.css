@@ -1,0 +1,115 @@
+.authContainer {
+    min-height: calc(100vh - var(--nav-height) - 400px);
+    /* Adjust based on footer height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    position: relative;
+}
+
+.backLink {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.backLink:hover {
+    color: var(--brand-primary);
+}
+
+.authCard {
+    width: 100%;
+    max-width: 480px;
+    padding: 3rem 2.5rem;
+    animation: slideUp 0.5s ease;
+}
+
+.authHeader {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.authHeader h2 {
+    margin-bottom: 0.5rem;
+}
+
+.authHeader p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroup label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.submitBtn {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    font-size: 1.05rem;
+}
+
+.authFooter {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.link {
+    font-weight: 600;
+    color: var(--brand-primary);
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

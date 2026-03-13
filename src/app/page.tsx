@@ -1,65 +1,355 @@
-import Image from "next/image";
+import Link from 'next/link';
+import ArticleAuthor from '@/components/ArticleAuthor';
+import AuthorLink from '@/components/AuthorLink';
+import { ArrowRight, BookOpen, MessageSquare, Calendar, Star, Image, Users, TrendingUp } from 'lucide-react';
+import prisma from '@/lib/prisma';
+import { unstable_noStore as noStore } from 'next/cache';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import styles from './page.module.css';
 
-export default function Home() {
+export default async function Home() {
+  noStore();
+
+  const [articles, forums, galleryItems, programs, totalUsers] = await Promise.all([
+    prisma.article.findMany({
+      where: { published: true },
+      include: { author: true, category: true },
+      orderBy: { createdAt: 'desc' },
+      take: 4,
+    }),
+    prisma.forum.findMany({
+      include: { author: true, _count: { select: { comments: true } } },
+      orderBy: { updatedAt: 'desc' },
+      take: 3,
+    }),
+    prisma.galleryItem.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+      include: { uploadedBy: { select: { name: true } } }
+    }),
+    prisma.program.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+    }),
+    prisma.user.count(),
+  ]);
+
+  const totalArticles = await prisma.article.count({ where: { published: true } });
+  const totalForums = await prisma.forum.count();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className={styles.page}>
+
+      {/* ===== HERO ===== */}
+      <section className={styles.hero}>
+        <div className="container">
+          <div className={styles.heroContent}>
+            <h1 className={`${styles.heroTitle} animate-fade-up delay-1`}>
+              Selamat Datang di Website Resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten
+            </h1>
+            <p className={`${styles.heroSub} animate-fade-up delay-2`}>
+              Menyatukan Asa, Mempererat Silaturahmi, Bangkit Bersama
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== INTRO ===== */}
+      <section className={styles.intro}>
+        <div className="container">
+          <h2 className="text-2xl font-semibold mb-4">Tentang IKADA</h2>
+          <p>
+            Ikatan Keluarga Alumni Darussalam (IKADA) Jabodetabek-Banten adalah rumah bagi seluruh alumni Pondok Pesantren Darussalam Ciamis yang berdomisili di wilayah Jakarta, Bogor, Depok, Tangerang, Bekasi, dan Banten. Didirikan atas dasar semangat kekeluargaan, kami berkomitmen untuk menjadi wadah yang mempererat tali persaudaraan, membangun potensi alumni, dan memberikan kontribusi positif bagi almamater serta masyarakat luas.
+          </p>
+          <Link href="/about" className="btn btn-primary btn-sm mt-4">Lebih Lanjut</Link>
+        </div>
+      </section>
+
+      {/* ===== VISION ===== */}
+      <section className={styles.vision}>
+        <div className="container">
+          <h2 className="text-2xl font-semibold mb-4">Visi Kami</h2>
+          <p>
+            Menjadi organisasi alumni yang kuat dan solid, bergerak bersama untuk mewujudkan masyarakat yang sejahtera, terbuka, dan berkeadilan, sambil terus menumbuhkembangkan dan mempererat ikatan silaturahmi antar sesama alumni.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* ===== PROGRAM ===== */}
+      {programs.length > 0 && (
+        <section className={styles.program}>
+          <div className="container">
+            <h2 className="text-2xl font-semibold mb-4">Program Unggulan Kami</h2>
+            <div className={styles.programGrid}>
+              {programs.map(program => (
+                <div key={program.id} className={styles.programCard}>
+                  {program.image && (
+                    <img
+                      src={program.image}
+                      alt={program.title}
+                      className={styles.programImage}
+                    />
+                  )}
+                  <div className={styles.programContent}>
+                    <h3 className={styles.programTitle}>{program.title}</h3>
+                    <p className={styles.programDesc}>{program.description}</p>
+                    {program.category && (
+                      <span className="badge badge-primary">{program.category}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Link href="/program" className="btn btn-secondary btn-sm mt-4">Lihat Semua Program</Link>
+          </div>
+        </section>
+      )}
+
+      {/* ===== FEATURES ===== */}
+      <section className={styles.features}>
+        <div className="container">
+          <div className="section-header animate-fade-up">
+            <span className="section-eyebrow">Fitur Kami</span>
+            <h2>3 Pilar <span className="text-gradient">Utama</span> Disada</h2>
+            <p>Semua yang kamu butuhkan untuk berkarya, berdiskusi, dan berkembang ada di sini.</p>
+          </div>
+
+          <div className={styles.featureGrid}>
+            {[
+              {
+                icon: <BookOpen size={28} />,
+                color: 'var(--brand-primary)',
+                bg: 'rgba(99,102,241,.1)',
+                title: 'Ruang Kata',
+                desc: 'Artikel dan opini tajam dari penulis muda. Wadah mengekspresikan pemikiran kritis tentang isu-isu terkini.',
+                link: '/writings',
+                label: 'Jelajahi Tulisan',
+              },
+              {
+                icon: <MessageSquare size={28} />,
+                color: 'var(--brand-secondary)',
+                bg: 'rgba(236,72,153,.1)',
+                title: 'Ruang Diskusi',
+                desc: 'Forum interaktif untuk bertukar ide. Jangan hanya membaca – ikutlah beropini dalam diskusi yang membangun.',
+                link: '/forums',
+                label: 'Ikut Diskusi',
+              },
+              {
+                icon: <Calendar size={28} />,
+                color: 'var(--brand-accent)',
+                bg: 'rgba(6,182,212,.1)',
+                title: 'Jejak Karya',
+                desc: 'Event, webinar, dan kompetisi terkurasi untuk meningkatkan skill dan jaringan profesional kamu.',
+                link: '/events',
+                label: 'Lihat Event',
+              },
+              {
+                icon: <Star size={28} />,
+                color: 'var(--brand-emerald)',
+                bg: 'rgba(16,185,129,.1)',
+                title: 'Program Kerja',
+                desc: 'Berbagai program sosial dan pengembangan yang dirancang untuk anggota IKADA.',
+                link: '/program',
+                label: 'Program Kami',
+              },
+            ].map((f, i) => (
+              <div key={i} className={`card ${styles.featureCard} animate-fade-up delay-${i + 2}`}>
+                <div className={styles.featureIconWrap} style={{ background: f.bg, color: f.color }}>
+                  {f.icon}
+                </div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
+                <Link href={f.link} className={styles.featureLink} style={{ color: f.color }}>
+                  {f.label} <ArrowRight size={15} />
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* ===== LATEST WRITINGS ===== */}
+      {articles.length > 0 && (
+        <section className={styles.section}>
+          <div className="container">
+            <div className={styles.sectionTop}>
+              <div>
+                <span className="section-eyebrow">Terbaru</span>
+                <h2>Tulisan <span className="text-gradient">Pilihan</span></h2>
+              </div>
+              <Link href="/writings" className="btn btn-ghost btn-sm">
+                Lihat Semua <ArrowRight size={15} />
+              </Link>
+            </div>
+
+            <div className={styles.articleGrid}>
+              {/* Featured first article */}
+              <Link
+                href={`/writings/${articles[0].slug}`}
+                className={`${styles.featuredCard} card${articles[0].thumbnail ? ` ${styles.featuredCardWithImg}` : ''}`}
+              >
+                <div className={styles.featuredImgWrap}>
+                  <div
+                    className={styles.featuredImg}
+                    style={
+                      articles[0].thumbnail
+                        ? {
+                            backgroundImage: `url(${articles[0].thumbnail})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                            opacity: 1,
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+                <div className={styles.featuredContent}>
+                  {articles[0].category && (
+                    <span className="badge badge-primary">{articles[0].category.name}</span>
+                  )}
+                  <h3 className={styles.featuredTitle}>{articles[0].title}</h3>
+                  <p className={styles.featuredExcerpt}>
+                    {articles[0].excerpt || articles[0].content.substring(0, 160) + '...'}
+                  </p>
+                  <div className={styles.articleMeta}>
+                    <ArticleAuthor author={articles[0].author} anonymous={articles[0].anonymous} className={styles.metaAuthor} stopPropagation />
+                    <span className={styles.metaDot}>·</span>
+                    <span className={styles.metaDate}>
+                      {format(new Date(articles[0].createdAt), 'dd MMM yyyy', { locale: id })}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Side articles */}
+              <div className={styles.articleSide}>
+                {articles.slice(1, 4).map(a => (
+                  <Link key={a.id} href={`/writings/${a.slug}`} className={`${styles.miniCard} card`}>
+                    <div>
+                      {a.category && <span className="badge badge-primary" style={{ marginBottom: '0.5rem' }}>{a.category.name}</span>}
+                      <h4 className={styles.miniTitle}>{a.title}</h4>
+                      <div className={styles.articleMeta} style={{ marginTop: '0.5rem' }}>
+                        <ArticleAuthor author={a.author} anonymous={a.anonymous} className={styles.metaAuthor} stopPropagation />
+                        <span className={styles.metaDot}>·</span>
+                        <span className={styles.metaDate}>{format(new Date(a.createdAt), 'dd MMM', { locale: id })}</span>
+                      </div>
+                    </div>
+                    <ArrowRight size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== FEATURED GALLERY ===== */}
+      {galleryItems.length > 0 && (
+        <section className={styles.section}>
+          <div className="container">
+            <div className={styles.sectionTop}>
+              <div>
+                <span className="section-eyebrow">Galeri</span>
+                <h2>Gambar <span className="text-gradient">Pilihan</span></h2>
+              </div>
+              <Link href="/gallery" className="btn btn-ghost btn-sm">
+                Lihat Semua <ArrowRight size={15} />
+              </Link>
+            </div>
+
+            <div className={styles.galleryGrid}>
+              {galleryItems.slice(0, 6).map(item => (
+                <div key={item.id} className={styles.galleryItem}>
+                  <img
+                    src={item.url}
+                    alt={item.category || 'Gallery item'}
+                    className={styles.galleryImg}
+                    loading="lazy"
+                  />
+                  <div className={styles.galleryOverlay}>
+                    {item.category && (
+                      <span className="badge badge-primary">{item.category}</span>
+                    )}
+                    <div className={styles.galleryMeta}>
+                      <span className={styles.galleryAuthor}>Oleh {item.uploadedBy.name}</span>
+                      <span className={styles.galleryDate}>
+                        {format(new Date(item.createdAt), 'dd MMM yyyy', { locale: id })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== LATEST FORUMS ===== */}
+      {forums.length > 0 && (
+        <section className={`${styles.section} ${styles.forumSection}`}>
+          <div className="container">
+            <div className={styles.sectionTop}>
+              <div>
+                <span className="section-eyebrow">Diskusi Hangat</span>
+                <h2>Ruang <span className="text-gradient">Diskusi</span></h2>
+              </div>
+              <Link href="/forums" className="btn btn-ghost btn-sm">
+                Lihat Semua <ArrowRight size={15} />
+              </Link>
+            </div>
+
+            <div className={styles.forumList}>
+              {forums.map((f, i) => (
+                <Link key={f.id} href={`/forums/${f.id}`} className={`${styles.forumRow} card animate-fade-up delay-${i + 1}`}>
+                  <div className={styles.forumNum}>{String(i + 1).padStart(2, '0')}</div>
+                  <div className={styles.forumInfo}>
+                    <h4 className={styles.forumTitle}>{f.title}</h4>
+                    <div className={styles.articleMeta}>
+                      <AuthorLink href={`/profile/${f.author.id}`} className={styles.metaAuthor} stopPropagation>
+                          {f.author.name}
+                      </AuthorLink>
+                      <span className={styles.metaDot}>·</span>
+                      <MessageSquare size={13} />
+                      <span>{f._count.comments} komentar</span>
+                    </div>
+                  </div>
+                  <ArrowRight size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== CTA ===== */}
+      <section className={styles.cta}>
+        <div className="container">
+          <div className={styles.ctaBox}>
+            <div className={styles.ctaDecor1} />
+            <div className={styles.ctaDecor2} />
+            <div className={styles.ctaContent}>
+              <div className={styles.ctaIcons}>
+                <Users size={28} />
+                <Star size={28} />
+                <TrendingUp size={28} />
+              </div>
+              <h2>Siap untuk Memulai Perjalananmu?</h2>
+              <p>Bergabunglah dengan ribuan pemuda yang berani bersuara dan berkarya nyata di platform kami.</p>
+              <div className={styles.ctaBtns}>
+                <Link href="/register" className="btn btn-primary btn-lg">
+                  Buat Akun Gratis <ArrowRight size={18} />
+                </Link>
+                <Link href="/writings" className="btn btn-ghost btn-lg">
+                  Jelajahi Tulisan
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
