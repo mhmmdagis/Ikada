@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 
 export async function POST(req: NextRequest) {
     try {
@@ -32,27 +31,19 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'File too large' }, { status: 400 });
         }
 
-        // Create uploads directory if it doesn't exist
-        const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-
         // Generate unique filename
         const timestamp = Date.now();
         const randomStr = Math.random().toString(36).substring(2, 8);
-        const ext = path.extname(file.name);
-        const filename = `${timestamp}-${randomStr}${ext}`;
-        const filepath = path.join(uploadsDir, filename);
+        const ext = file.name.substring(file.name.lastIndexOf('.'));
+        const filename = `disada-${timestamp}-${randomStr}${ext}`;
 
-        // Save file
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        fs.writeFileSync(filepath, buffer);
+        // Upload to Vercel Blob
+        const blob = await put(filename, file, {
+            access: 'public',
+        });
 
         // Return URL
-        const url = `/uploads/${filename}`;
-        return NextResponse.json({ url, success: true });
+        return NextResponse.json({ url: blob.url, success: true });
     } catch (error) {
         console.error('[UPLOAD ERROR]', error);
         return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
