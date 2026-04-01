@@ -53,8 +53,6 @@ export default function Footer() {
                     <h4 className={styles.linkHeader}>Organization</h4>
                     <ul className={styles.linkList}>
                         <li><Link href="/about">About Us</Link></li>
-                        <li><Link href="/contact">Contact</Link></li>
-                        <li><Link href="/terms">Terms of Service</Link></li>
                     </ul>
                 </div>
 
