@@ -5,7 +5,7 @@ import { Heart } from 'lucide-react';
 
 interface LikeButtonProps {
     targetId: string;
-    type: 'article' | 'forum';
+    type: 'article' | 'forum' | 'comment';
     initialCount: number;
     initialLiked?: boolean;
     className?: string;
@@ -16,7 +16,12 @@ export default function LikeButton({ targetId, type, initialCount, initialLiked 
     const [count, setCount] = useState(initialCount);
     const [loading, setLoading] = useState(false);
 
-    const apiPath = type === 'article' ? `/api/articles/${targetId}/like` : `/api/forums/${targetId}/like`;
+    const apiPath =
+        type === 'article'
+            ? `/api/articles/${targetId}/like`
+            : type === 'forum'
+                ? `/api/forums/${targetId}/like`
+                : `/api/comments/${targetId}/like`;
 
     const handleClick = async () => {
         if (loading) return;
@@ -59,7 +64,7 @@ export default function LikeButton({ targetId, type, initialCount, initialLiked 
                 cursor: loading ? 'wait' : 'pointer',
                 padding: 0,
                 fontSize: 'inherit',
-                color: liked ? 'var(--brand-primary, #6366f1)' : 'var(--text-tertiary, #94a3b8)',
+                color: liked ? 'var(--brand-primary, #2ec4b6)' : 'var(--text-tertiary, #94a3b8)',
                 transition: 'color 0.2s, transform 0.2s',
                 opacity: loading ? 0.7 : 1,
             }}

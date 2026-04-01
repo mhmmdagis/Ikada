@@ -62,7 +62,9 @@ export default function RegisterPage() {
                 ) : (
                     <>
                         <Link href="/" className={styles.logo}>
-                            <div className={styles.logoIcon}><Flame size={18} /></div>
+                            <div className={styles.logoIcon}>
+                                <img src="/ikada-logo.png" alt="Disada Logo" draggable="false" />
+                            </div>
                             <span className="text-gradient" style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem' }}>Disada</span>
                         </Link>
 

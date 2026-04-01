@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       }, { status: 404 });
     }
 
-    const isAdmin = user.role === 'ADMIN';
+    const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
     const userFilter = isAdmin ? {} : { authorId: session.userId };
 
     // Fetch data based on type

@@ -39,18 +39,20 @@ export default function GalleryPage() {
     return (
         <div className={styles.galleryPage}>
             <div className="container">
-                <h1>Galeri Foto &amp; Video</h1>
-                <p>Koleksi media alumni IKADA Jabodetabek-Banten.</p>
+                <div className={styles.header}>
+                    <h1 className={styles.title}>Galeri Foto &amp; Video</h1>
+                    <p className={styles.subtitle}>Koleksi media alumni IKADA Jabodetabek-Banten.</p>
+                </div>
 
                 {galleryCategories.length > 0 && (
-                    <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.9rem' }}>Filter kategori:</span>
+                    <div className={styles.controls}>
+                        <span>Filter kategori:</span>
                         <select
-                            className="input input-bordered input-sm"
+                            className={styles.select}
                             value={filterCategory}
                             onChange={(e) => setFilterCategory(e.target.value)}
                         >
-                            <option value="">Semua</option>
+                            <option value="">Semua Foto/Video</option>
                             {galleryCategories.map(cat => (
                                 <option key={cat} value={cat}>
                                     {cat}
@@ -61,7 +63,9 @@ export default function GalleryPage() {
                 )}
 
                 {filteredFiles.length === 0 ? (
-                    <p style={{ color: 'var(--text-secondary)' }}>Belum ada galeri.</p>
+                    <div className={styles.emptyState}>
+                        <p>Belum ada media galeri yang tersedia.</p>
+                    </div>
                 ) : (
                     <div className={styles.grid}>
                         {filteredFiles.map((item, idx) => {
@@ -69,14 +73,14 @@ export default function GalleryPage() {
                             const cat = item.category;
                             const ext = url.split('.').pop()?.toLowerCase();
                             return (
-                                <div key={idx} className="relative">
+                                <div key={idx} className={styles.mediaCard}>
+                                    {cat && (
+                                        <span className={styles.badge}>{cat}</span>
+                                    )}
                                     {ext && ['mp4', 'webm', 'ogg'].includes(ext) ? (
                                         <video src={url} controls className={styles.mediaItem} />
                                     ) : (
-                                        <img src={url} alt="gallery item" className={styles.mediaItem} />
-                                    )}
-                                    {cat && (
-                                        <span className="badge badge-sm badge-secondary absolute top-2 left-2">{cat}</span>
+                                        <img src={url} alt="gallery item" className={styles.mediaItem} loading="lazy" />
                                     )}
                                 </div>
                             );

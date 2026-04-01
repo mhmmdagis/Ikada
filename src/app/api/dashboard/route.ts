@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get('limit') || '20');
+    const myLimit = parseInt(searchParams.get('myLimit') || '10');
 
     // Get user role
     const user = await prisma.user.findUnique({
@@ -29,18 +30,17 @@ export async function GET(req: NextRequest) {
       }, { status: 404 });
     }
 
-    const isAdmin = user.role === 'ADMIN';
+    const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
 
     // Build where clauses based on user role
-    const userFilter = isAdmin ? {} : { authorId: session.userId };
+    const authorFilter = isAdmin ? {} : { authorId: session.userId };
 
-    // Get recent activities from all models
+    // Get recent activities (personal for normal users; full for admins)
     const [recentArticles, recentForums, recentComments, recentUsers, recentEvents, recentGallery] = await Promise.all([
-      // Recent articles
       prisma.article.findMany({
-        take: Math.ceil(limit / 5),
+        take: Math.ceil(limit / (isAdmin ? 5 : 3)),
         orderBy: { createdAt: 'desc' },
-        where: userFilter,
+        where: authorFilter,
         select: {
           id: true,
           title: true,
@@ -48,6 +48,9 @@ export async function GET(req: NextRequest) {
           excerpt: true,
           anonymous: true,
           createdAt: true,
+          visibility: true,
+          scheduledAt: true,
+          published: true,
           author: {
             select: {
               id: true,
@@ -66,11 +69,10 @@ export async function GET(req: NextRequest) {
         }
       }),
 
-      // Recent forums
       prisma.forum.findMany({
-        take: Math.ceil(limit / 5),
+        take: Math.ceil(limit / (isAdmin ? 5 : 3)),
         orderBy: { createdAt: 'desc' },
-        where: userFilter,
+        where: authorFilter,
         select: {
           id: true,
           title: true,
@@ -99,11 +101,10 @@ export async function GET(req: NextRequest) {
         }
       }),
 
-      // Recent comments
       prisma.comment.findMany({
-        take: Math.ceil(limit / 5),
+        take: Math.ceil(limit / (isAdmin ? 5 : 3)),
         orderBy: { createdAt: 'desc' },
-        where: userFilter,
+        where: isAdmin ? {} : { authorId: session.userId },
         select: {
           id: true,
           content: true,
@@ -132,7 +133,6 @@ export async function GET(req: NextRequest) {
         }
       }),
 
-      // Recent users (only admins see new user registrations)
       isAdmin ? prisma.user.findMany({
         take: Math.ceil(limit / 5),
         orderBy: { createdAt: 'desc' },
@@ -146,8 +146,7 @@ export async function GET(req: NextRequest) {
         }
       }) : Promise.resolve([]),
 
-      // Recent/upcoming events
-      prisma.event.findMany({
+      isAdmin ? prisma.event.findMany({
         take: Math.ceil(limit / 5),
         orderBy: { createdAt: 'desc' },
         where: {
@@ -164,9 +163,8 @@ export async function GET(req: NextRequest) {
           image: true,
           createdAt: true
         }
-      }),
+      }) : Promise.resolve([]),
 
-      // Recent gallery items (admin only)
       isAdmin ? prisma.galleryItem.findMany({
         take: Math.ceil(limit / 5),
         orderBy: { createdAt: 'desc' },
@@ -177,6 +175,47 @@ export async function GET(req: NextRequest) {
           createdAt: true
         }
       }) : Promise.resolve([])
+    ]);
+
+    // "My content" lists for grouping inside dashboard UI (always based on current user)
+    const [myArticles, myForums, myComments] = await Promise.all([
+      prisma.article.findMany({
+        take: myLimit,
+        orderBy: { createdAt: 'desc' },
+        where: { authorId: session.userId },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          createdAt: true,
+          visibility: true,
+          published: true,
+          scheduledAt: true,
+        }
+      }),
+      prisma.forum.findMany({
+        take: myLimit,
+        orderBy: { createdAt: 'desc' },
+        where: { authorId: session.userId },
+        select: {
+          id: true,
+          title: true,
+          createdAt: true,
+          _count: { select: { comments: true } }
+        }
+      }),
+      prisma.comment.findMany({
+        take: myLimit,
+        orderBy: { createdAt: 'desc' },
+        where: { authorId: session.userId },
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          article: { select: { id: true, title: true, slug: true } },
+          forum: { select: { id: true, title: true } },
+        }
+      }),
     ]);
 
     // Combine and sort all activities by createdAt/date
@@ -265,10 +304,10 @@ export async function GET(req: NextRequest) {
     ]) : await Promise.all([
       prisma.article.count({ where: { authorId: session.userId } }),
       prisma.forum.count({ where: { authorId: session.userId } }),
-      prisma.user.count(), // Total users tetap ditampilkan
       prisma.comment.count({ where: { authorId: session.userId } }),
-      prisma.event.count(), // Events ditampilkan untuk semua user
-      prisma.galleryItem.count() // gallery items always counted
+      prisma.user.count(),
+      prisma.event.count(),
+      prisma.galleryItem.count()
     ]);
 
     const [articleCount, forumCount, userCount, commentCount, eventCount, galleryCount] = stats;
@@ -283,6 +322,11 @@ export async function GET(req: NextRequest) {
         comments: commentCount,
         events: eventCount,
         gallery: galleryCount
+      },
+      my: {
+        articles: myArticles,
+        forums: myForums.map(f => ({ ...f, commentsCount: f._count.comments })),
+        comments: myComments,
       },
       isAdmin,
       statsType: isAdmin ? 'global' : 'personal'

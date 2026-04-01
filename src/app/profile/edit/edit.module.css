@@ -1,42 +1,46 @@
 .container {
-    max-width: 600px;
+    max-width: 700px;
     margin: 2rem auto;
-    padding: 1.5rem;
-    background: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-md);
 }
 
 .header {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
 }
 
 .header h1 {
     margin: 0;
     font-size: 1.8rem;
+    color: var(--text-primary);
 }
 
 .backBtn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background: #f3f4f6;
-    color: #333;
+    padding: 0.6rem 1rem;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
     text-decoration: none;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-    cursor: pointer;
-    font-weight: 500;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    transition: all var(--ease-normal);
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .backBtn:hover {
-    background: #e5e7eb;
-    border-color: #d1d5db;
+    background: var(--border-medium);
+    color: var(--text-primary);
 }
 
 .form {
@@ -53,25 +57,29 @@
 
 .formGroup label {
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     font-size: 0.95rem;
 }
 
 .input,
 .textarea {
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
     font-size: 1rem;
     font-family: inherit;
-    transition: border-color 0.2s;
+    transition: border-color var(--ease-fast), box-shadow var(--ease-fast), background var(--ease-fast);
 }
 
 .input:focus,
 .textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: var(--bg-primary);
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(46, 196, 182, 0.15);
 }
 
 .textarea {
@@ -80,37 +88,71 @@
 }
 
 .hint {
-    color: #6b7280;
+    color: var(--text-tertiary);
     font-size: 0.85rem;
 }
 
 .sectionTitle {
-    margin-top: 0.5rem;
-    margin-bottom: 0.25rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: #6b7280;
+    color: var(--brand-primary);
+    border-bottom: 1px dashed var(--border-light);
+    padding-bottom: 0.5rem;
+}
+
+/* Social media label with icon */
+.socialLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+/* Input wrapper with left icon */
+.inputIconWrapper {
+    position: relative;
+}
+
+.inputIconLeft {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.inputWithIcon {
+    padding-left: 2.5rem !important;
 }
 
 .actions {
     display: flex;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
 }
 
 .submitBtn {
     flex: 1;
     padding: 0.875rem 1.5rem;
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    background: var(--gradient-main);
     color: white;
     border: none;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-full);
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--ease-normal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,7 +161,7 @@
 
 .submitBtn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: var(--shadow-glow);
 }
 
 .submitBtn:disabled {
@@ -130,37 +172,39 @@
 .cancelBtn {
     flex: 1;
     padding: 0.875rem 1.5rem;
-    background: #f3f4f6;
-    color: #333;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
     font-weight: 600;
     text-align: center;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all var(--ease-normal);
 }
 
 .cancelBtn:hover {
-    background: #e5e7eb;
+    background: var(--border-medium);
+    color: var(--text-primary);
 }
 
 .error,
 .success {
     padding: 1rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     font-weight: 500;
+    border: 1px solid transparent;
 }
 
 .error {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
 .success {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #bbf7d0;
+    background: rgba(46, 196, 182, 0.1);
+    color: var(--success);
+    border-color: rgba(46, 196, 182, 0.2);
 }
 
 .loading {
@@ -169,7 +213,7 @@
     justify-content: center;
     min-height: 400px;
     font-size: 1.2rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .spinning {
@@ -177,26 +221,23 @@
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .avatarRow {
     display: flex;
-    gap: 1rem;
-    align-items: flex-start;
+    gap: 1.5rem;
+    align-items: center;
 }
 
 .avatarPreview {
-    width: 72px;
-    height: 72px;
-    border-radius: 999px;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
     overflow: hidden;
-    background: #e5e7eb;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -211,79 +252,86 @@
 
 .avatarPlaceholder {
     font-weight: 600;
-    color: #6b7280;
+    color: var(--text-tertiary);
+    font-size: 2rem;
 }
 
 .avatarControls {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .avatarButtons {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.25rem;
 }
 
 .avatarUploadBtn,
 .avatarGalleryBtn {
-    padding: 0.5rem 0.9rem;
-    border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
     font-size: 0.85rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    transition: all var(--ease-normal);
 }
 
 .avatarUploadBtn:hover,
 .avatarGalleryBtn:hover {
-    background: #eef2ff;
-    border-color: #4f46e5;
-    transform: translateY(-1px);
+    background: var(--bg-tertiary);
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
 }
 
 .gallery {
-    margin-top: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
-    background: #f9fafb;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    background: var(--bg-secondary);
 }
 
 .galleryInfo {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
 
 .galleryError {
     font-size: 0.85rem;
-    color: #b91c1c;
+    color: var(--error);
     margin-bottom: 0.5rem;
 }
 
 .galleryGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
 }
 
 .galleryItem {
-    border: none;
+    border: 2px solid transparent;
     padding: 0;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-sm);
     overflow: hidden;
     cursor: pointer;
     background: transparent;
+    transition: border-color var(--ease-fast);
+}
+
+.galleryItem:hover {
+    border-color: var(--brand-primary);
 }
 
 .galleryItem img {
     width: 100%;
-    height: 72px;
+    height: 80px;
     object-fit: cover;
     display: block;
 }
@@ -292,54 +340,36 @@
     margin-top: 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
 }
 
 .passwordMeter {
     width: 100%;
     height: 6px;
-    border-radius: 999px;
-    background: #e5e7eb;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
     overflow: hidden;
 }
 
 .passwordMeterFill {
     height: 100%;
-    border-radius: 999px;
-    transition: width 0.2s ease, background-color 0.2s ease;
+    border-radius: var(--radius-full);
+    transition: width 0.3s var(--ease-normal), background-color 0.3s var(--ease-normal);
 }
 
-.passwordWeak {
-    background: #f97373;
-}
+.passwordWeak { background: var(--error); }
+.passwordMedium { background: var(--warning); }
+.passwordStrong { background: var(--success); }
 
-.passwordMedium {
-    background: #facc15;
-}
-
-.passwordStrong {
-    background: #22c55e;
-}
-
-.passwordLabelWeak {
-    font-size: 0.8rem;
-    color: #b91c1c;
-}
-
-.passwordLabelMedium {
-    font-size: 0.8rem;
-    color: #92400e;
-}
-
-.passwordLabelStrong {
-    font-size: 0.8rem;
-    color: #166534;
-}
+.passwordLabelWeak { font-size: 0.8rem; color: var(--error); }
+.passwordLabelMedium { font-size: 0.8rem; color: var(--warning); }
+.passwordLabelStrong { font-size: 0.8rem; color: var(--success); }
 
 @media (max-width: 640px) {
     .container {
         margin: 1rem;
-        padding: 1rem;
+        padding: 1.5rem;
+        border-radius: var(--radius-lg);
     }
 
     .header {
@@ -361,7 +391,7 @@
     }
 
     .avatarRow {
-        flex-direction: row;
-        align-items: center;
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

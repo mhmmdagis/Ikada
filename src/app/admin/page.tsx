@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                     </Link>
 
                     <Link href="/admin/forums" className={styles.statCard}>
-                        <div className={styles.statIcon} style={{ background: '#ec4899' }}>
+                        <div className={styles.statIcon} style={{ background: '#1b9aaa' }}>
                             <Zap size={32} color="white" />
                         </div>
                         <div className={styles.statContent}>
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
                     </Link>
 
                     <Link href="/admin/programs" className={styles.statCard}>
-                        <div className={styles.statIcon} style={{ background: '#06b6d4' }}>
+                        <div className={styles.statIcon} style={{ background: '#ffd60a' }}>
                             <Layout size={32} color="white" />
                         </div>
                         <div className={styles.statContent}>
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
                         </Link>
                         {(() => {
                             console.log('🎯 Rendering export button check - userRole:', userRole, 'is ADMIN?', userRole === 'ADMIN');
-                            return userRole === 'ADMIN' && (
+                            return (userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') && (
                                 <div className={styles.actionCard} onClick={() => handleExportData('xlsx')} style={{ cursor: 'pointer' }}>
                                     <Download size={16} style={{ marginRight: '8px' }} />
                                     Export Data (XLSX)

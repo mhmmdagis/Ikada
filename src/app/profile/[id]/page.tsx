@@ -19,6 +19,8 @@ export default async function ProfilePage({ params }: Params) {
             name: true,
             email: true,
             bio: true,
+            major: true,
+            batch: true,
             avatar: true,
             role: true,
             instagram: true,
@@ -43,6 +45,8 @@ export default async function ProfilePage({ params }: Params) {
             name={user.name}
             email={user.email}
             bio={user.bio || undefined}
+            major={user.major || undefined}
+            batch={user.batch || undefined}
             role={user.role}
             instagram={user.instagram || undefined}
             twitter={user.twitter || undefined}

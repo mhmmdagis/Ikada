@@ -97,7 +97,7 @@ function ResetPasswordForm() {
                     <p style={{ color: '#666', marginBottom: '20px' }}>{error}</p>
                     <Link href="/auth/forgot-password" style={{
                         display: 'inline-block',
-                        background: '#6366f1',
+                        background: '#2ec4b6',
                         color: 'white',
                         padding: '10px 20px',
                         borderRadius: '6px',
@@ -141,7 +141,7 @@ function ResetPasswordForm() {
                 </Link>
 
                 <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                    <Lock size={48} style={{ color: '#6366f1', margin: '0 auto 20px' }} />
+                    <Lock size={48} style={{ color: '#2ec4b6', margin: '0 auto 20px' }} />
                     <h1 style={{ margin: '0 0 10px', color: '#333' }}>Reset Password</h1>
                     <p style={{ color: '#666' }}>Masukkan password baru Anda.</p>
                 </div>
@@ -235,7 +235,7 @@ function ResetPasswordForm() {
                         style={{
                             width: '100%',
                             padding: '12px 16px',
-                            background: '#6366f1',
+                            background: '#2ec4b6',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -260,7 +260,7 @@ function ResetPasswordForm() {
                 </form>
 
                 <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                    <Link href="/auth/forgot-password" style={{ color: '#6366f1', textDecoration: 'none', fontSize: '14px' }}>
+                    <Link href="/auth/forgot-password" style={{ color: '#2ec4b6', textDecoration: 'none', fontSize: '14px' }}>
                         Kirim ulang link reset
                     </Link>
                 </div>
@@ -288,7 +288,7 @@ export default function ResetPasswordPage() {
                     width: '100%',
                     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
                 }}>
-                    <Loader size={48} style={{ color: '#6366f1', margin: '0 auto 20px' }} className="animate-spin" />
+                    <Loader size={48} style={{ color: '#2ec4b6', margin: '0 auto 20px' }} className="animate-spin" />
                     <p style={{ color: '#666' }}>Memuat...</p>
                 </div>
             </div>

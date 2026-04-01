@@ -79,7 +79,7 @@
 .forumCard:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: rgba(46, 196, 182, 0.3);
 }
 
 .forumMain {

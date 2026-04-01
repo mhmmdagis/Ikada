@@ -9,6 +9,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid transparent;
+    border-top: 4px solid var(--brand-primary);
     transition: all var(--ease-normal);
 }
 
@@ -51,10 +52,17 @@
     justify-content: center;
     width: 34px;
     height: 34px;
-    border-radius: var(--radius-md);
-    background: var(--gradient-main);
-    color: white;
     flex-shrink: 0;
+}
+
+.brandIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+:global([data-theme="dark"]) .brandIcon img {
+    filter: invert(1) brightness(1.2);
 }
 
 /* Desktop Nav */
@@ -90,8 +98,8 @@
 }
 
 .navLink.active {
-    background: rgba(99, 102, 241, .1);
-    color: var(--brand-primary) !important;
+    background: var(--brand-primary);
+    color: #fff !important;
     font-weight: 600;
 }
 
@@ -138,7 +146,7 @@
 
 .avatarBtn:hover {
     border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+    box-shadow: 0 0 0 3px rgba(46, 196, 182, .12);
 }
 
 .avatar {
@@ -316,8 +324,8 @@
 }
 
 .mobileActive {
-    color: var(--brand-primary) !important;
-    background: rgba(99, 102, 241, .08) !important;
+    color: #fff !important;
+    background: var(--brand-primary) !important;
 }
 
 .mobileLogout {

@@ -13,8 +13,10 @@ model User {
   name                   String
   email                  String        @unique
   password               String
-  role                   String        @default("USER") // 'USER' or 'ADMIN'
+  role                   String        @default("USER") // 'USER', 'ADMIN', 'SUPER_ADMIN'
   bio                    String?
+  major                  String?
+  batch                  String?
   avatar                 String? // profile picture URL
   instagram              String?
   twitter                String?
@@ -97,6 +99,10 @@ model Comment {
   forum     Forum?   @relation(fields: [forumId], references: [id], onDelete: Cascade)
   articleId String?
   article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  likes     Like[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -126,25 +132,42 @@ model Like {
   article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
   forumId   String?
   forum     Forum?   @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([userId, articleId])
   @@unique([userId, forumId])
+  @@unique([userId, commentId])
 }
 
 model GalleryItem {
   id           String   @id @default(cuid())
   url          String
   category     String?
+  categoryId   String?
+  categoryRel  GalleryCategory? @relation(fields: [categoryId], references: [id])
   uploadedById String
   uploadedBy   User     @relation(fields: [uploadedById], references: [id])
   createdAt    DateTime @default(now())
 }
 
 model GalleryCategory {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
+  id           String        @id @default(cuid())
+  name         String        @unique
+  slug         String        @unique
+  color        String        @default("#6366f1")
+  galleryItems GalleryItem[]
+  createdAt    DateTime      @default(now())
+}
+
+model ProgramCategory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  color     String    @default("#6366f1")
+  programs  Program[]
+  createdAt DateTime  @default(now())
 }
 
 model Program {
@@ -154,7 +177,9 @@ model Program {
   content     String?
   image       String?
   icon        String?
-  category    String? // e.g., "Sosial", "Pengembangan", "Edukasi"
+  category    String? // Keep for backward compatibility
+  categoryId  String?
+  categoryRel ProgramCategory? @relation(fields: [categoryId], references: [id])
   status      String   @default("ACTIVE") // ACTIVE, INACTIVE, ARCHIVED
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id])

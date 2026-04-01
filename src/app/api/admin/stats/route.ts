@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession, isAdminRole } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 export async function GET() {
@@ -7,7 +7,7 @@ export async function GET() {
         const session = await getSession();
         
         // Check if user is admin
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

@@ -26,7 +26,7 @@ export default function LoginPage() {
             const data = await res.json();
             if (!res.ok) { setError(data.error || 'Login gagal.'); return; }
             // send admin users to the admin dashboard
-            if (data.user?.role === 'ADMIN') {
+            if (data.user?.role === 'ADMIN' || data.user?.role === 'SUPER_ADMIN') {
                 router.push('/admin');
             } else {
                 router.push('/');
@@ -47,7 +47,9 @@ export default function LoginPage() {
             <div className={styles.card}>
                 {/* Logo */}
                 <Link href="/" className={styles.logo}>
-                    <div className={styles.logoIcon}><Flame size={18} /></div>
+                    <div className={styles.logoIcon}>
+                        <img src="/ikada-logo.png" alt="Disada Logo" draggable="false" />
+                    </div>
                     <span className="text-gradient" style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.2rem' }}>Disada</span>
                 </Link>
 
@@ -107,7 +109,7 @@ export default function LoginPage() {
                 </form>
 
                 <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <Link href="/auth/forgot-password" className={styles.forgotLink}>
+                    <Link href={`/auth/forgot-password${form.email ? `?email=${encodeURIComponent(form.email)}` : ''}`} className={styles.forgotLink}>
                         Lupa password?
                     </Link>
                 </div>

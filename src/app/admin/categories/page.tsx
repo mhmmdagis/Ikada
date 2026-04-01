@@ -19,17 +19,20 @@ export default function CategoriesPage() {
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState({ name: '', slug: '', color: '#6366f1' });
+    const [form, setForm] = useState({ name: '', slug: '', color: '#2ec4b6' });
     const [creating, setCreating] = useState(false);
     const [error, setError] = useState('');
-    const [galleryCategories, setGalleryCategories] = useState<string[]>([]);
+    const [galleryCategories, setGalleryCategories] = useState<Category[]>([]);
     const [galleryLoading, setGalleryLoading] = useState(true);
-    const [galleryNewName, setGalleryNewName] = useState('');
+    const [showGalleryForm, setShowGalleryForm] = useState(false);
+    const [galleryForm, setGalleryForm] = useState({ name: '', slug: '', color: '#10b981' });
     const [galleryCreating, setGalleryCreating] = useState(false);
     const [galleryDeleting, setGalleryDeleting] = useState<string | null>(null);
-    const [programCategories, setProgramCategories] = useState<string[]>([]);
+    
+    const [programCategories, setProgramCategories] = useState<Category[]>([]);
     const [programLoading, setProgramLoading] = useState(true);
-    const [programNewName, setProgramNewName] = useState('');
+    const [showProgramForm, setShowProgramForm] = useState(false);
+    const [programForm, setProgramForm] = useState({ name: '', slug: '', color: '#f59e0b' });
     const [programCreating, setProgramCreating] = useState(false);
     const [programDeleting, setProgramDeleting] = useState<string | null>(null);
 
@@ -58,7 +61,7 @@ export default function CategoriesPage() {
                 }
                 const data = await res.json();
                 if (data && Array.isArray(data.categories)) {
-                    setGalleryCategories(data.categories as string[]);
+                    setGalleryCategories(data.categories as Category[]);
                 }
             } catch (error) {
                 console.error('Failed to fetch gallery categories:', error);
@@ -76,7 +79,7 @@ export default function CategoriesPage() {
                 }
                 const data = await res.json();
                 if (data && Array.isArray(data.categories)) {
-                    setProgramCategories(data.categories as string[]);
+                    setProgramCategories(data.categories as Category[]);
                 }
             } catch (error) {
                 console.error('Failed to fetch program categories:', error);
@@ -109,7 +112,7 @@ export default function CategoriesPage() {
             const data = await res.json();
             if (res.ok) {
                 setCategories([...categories, data]);
-                setForm({ name: '', slug: '', color: '#6366f1' });
+                setForm({ name: '', slug: '', color: '#2ec4b6' });
                 setShowForm(false);
             } else {
                 setError(data.error || 'Failed to create category');
@@ -124,8 +127,7 @@ export default function CategoriesPage() {
 
     const handleCreateGalleryCategory = async (e: React.FormEvent) => {
         e.preventDefault();
-        const name = galleryNewName.trim();
-        if (!name) {
+        if (!galleryForm.name.trim()) {
             setError('Gallery category name required');
             return;
         }
@@ -136,15 +138,14 @@ export default function CategoriesPage() {
             const res = await fetch('/api/admin/gallery-categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify(galleryForm),
             });
 
             const data = await res.json();
             if (res.ok) {
-                if (!galleryCategories.includes(name)) {
-                    setGalleryCategories([...galleryCategories, name]);
-                }
-                setGalleryNewName('');
+                setGalleryCategories([...galleryCategories, data.category]);
+                setGalleryForm({ name: '', slug: '', color: '#10b981' });
+                setShowGalleryForm(false);
             } else {
                 setError(data.error || 'Failed to create gallery category');
             }
@@ -158,8 +159,7 @@ export default function CategoriesPage() {
 
     const handleCreateProgramCategory = async (e: React.FormEvent) => {
         e.preventDefault();
-        const name = programNewName.trim();
-        if (!name) {
+        if (!programForm.name.trim()) {
             setError('Program category name required');
             return;
         }
@@ -170,15 +170,14 @@ export default function CategoriesPage() {
             const res = await fetch('/api/admin/program-categories', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify(programForm),
             });
 
             const data = await res.json();
             if (res.ok) {
-                if (!programCategories.includes(name)) {
-                    setProgramCategories([...programCategories, name]);
-                }
-                setProgramNewName('');
+                setProgramCategories([...programCategories, data.category]);
+                setProgramForm({ name: '', slug: '', color: '#f59e0b' });
+                setShowProgramForm(false);
             } else {
                 setError(data.error || 'Failed to create program category');
             }
@@ -190,20 +189,20 @@ export default function CategoriesPage() {
         }
     };
 
-    const handleDeleteGalleryCategory = async (name: string) => {
+    const handleDeleteGalleryCategory = async (id: string, name: string) => {
         if (!confirm(`Delete gallery category "${name}"?`)) return;
 
-        setGalleryDeleting(name);
+        setGalleryDeleting(id);
         try {
             const res = await fetch('/api/admin/gallery-categories', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({ id }),
             });
 
             const data = await res.json();
             if (res.ok) {
-                setGalleryCategories(galleryCategories.filter(c => c !== name));
+                setGalleryCategories(galleryCategories.filter(c => c.id !== id));
             } else {
                 alert(data.error || 'Failed to delete gallery category');
             }
@@ -215,20 +214,20 @@ export default function CategoriesPage() {
         }
     };
 
-    const handleDeleteProgramCategory = async (name: string) => {
+    const handleDeleteProgramCategory = async (id: string, name: string) => {
         if (!confirm(`Hapus kategori program "${name}" dari semua program?`)) return;
 
-        setProgramDeleting(name);
+        setProgramDeleting(id);
         try {
             const res = await fetch('/api/admin/program-categories', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({ id }),
             });
 
             const data = await res.json();
             if (res.ok) {
-                setProgramCategories(programCategories.filter(c => c !== name));
+                setProgramCategories(programCategories.filter(c => c.id !== id));
             } else {
                 alert(data.error || 'Failed to delete program category');
             }
@@ -392,30 +391,59 @@ export default function CategoriesPage() {
                 Gunakan kategori ini saat mengupload foto/video di halaman galeri.
             </p>
 
-            <form onSubmit={handleCreateGalleryCategory} style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Nama kategori galeri baru (mis. Event, Dokumentasi)"
-                    value={galleryNewName}
-                    onChange={e => setGalleryNewName(e.target.value)}
-                    style={{ maxWidth: '320px' }}
-                />
+            {!showGalleryForm ? (
                 <button
-                    type="submit"
+                    onClick={() => setShowGalleryForm(true)}
+                    style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     className="btn btn-primary"
-                    disabled={galleryCreating}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                 >
-                    {galleryCreating ? (
-                        'Adding...'
-                    ) : (
-                        <>
-                            <Plus size={18} /> Add Gallery Category
-                        </>
-                    )}
+                    <Plus size={18} /> Add Gallery Category
                 </button>
-            </form>
+            ) : (
+                <form onSubmit={handleCreateGalleryCategory} style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                    <div className={styles.formGroup}>
+                        <label>Category Name *</label>
+                        <input
+                            type="text"
+                            className={styles.input}
+                            placeholder="e.g., Event, Dokumentasi"
+                            value={galleryForm.name}
+                            onChange={e => setGalleryForm({ ...galleryForm, name: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                        <label>Slug (optional)</label>
+                        <input
+                            type="text"
+                            className={styles.input}
+                            placeholder="auto-generated"
+                            value={galleryForm.slug}
+                            onChange={e => setGalleryForm({ ...galleryForm, slug: e.target.value })}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                        <label>Color</label>
+                        <input
+                            type="color"
+                            value={galleryForm.color}
+                            onChange={e => setGalleryForm({ ...galleryForm, color: e.target.value })}
+                            style={{ width: '60px', height: '40px', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+                        <button type="submit" className={styles.primaryBtn} disabled={galleryCreating}>
+                            {galleryCreating ? 'Creating...' : 'Create Category'}
+                        </button>
+                        <button type="button" onClick={() => setShowGalleryForm(false)} className={styles.cancelBtn}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            )}
 
             {galleryLoading ? (
                 <div className={styles.loading}>Loading gallery categories...</div>
@@ -425,21 +453,27 @@ export default function CategoriesPage() {
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
                         <div className={styles.colName}>Name</div>
+                        <div className={styles.colEmail}>Slug</div>
+                        <div className={styles.colRole}>Color</div>
                         <div className={styles.colAction}>Action</div>
                     </div>
                     <div className={styles.tableBody}>
                         {galleryCategories.map(cat => (
-                            <div key={cat} className={styles.tableRow}>
+                            <div key={cat.id} className={styles.tableRow}>
                                 <div className={styles.colName}>
-                                    <strong>{cat}</strong>
+                                    <strong>{cat.name}</strong>
+                                </div>
+                                <div className={styles.colEmail}>{cat.slug}</div>
+                                <div className={styles.colRole}>
+                                    <div style={{ width: '24px', height: '24px', background: cat.color, borderRadius: '4px' }} />
                                 </div>
                                 <div className={styles.colAction}>
                                     <button
-                                        onClick={() => handleDeleteGalleryCategory(cat)}
-                                        disabled={galleryDeleting === cat}
+                                        onClick={() => handleDeleteGalleryCategory(cat.id, cat.name)}
+                                        disabled={galleryDeleting === cat.id}
                                         className={styles.deleteBtn}
                                     >
-                                        {galleryDeleting === cat ? (
+                                        {galleryDeleting === cat.id ? (
                                             <Loader size={18} className={styles.spinning} />
                                         ) : (
                                             <Trash2 size={18} />
@@ -458,34 +492,62 @@ export default function CategoriesPage() {
 
             <h2 style={{ marginBottom: '0.75rem' }}>Program Categories</h2>
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-                Kategori ini berasal dari field kategori pada setiap program. Menghapus kategori di sini akan menghapus
-                kategori tersebut dari semua program yang menggunakannya (program tetap ada, hanya kategorinya yang dikosongkan).
+                Gunakan kategori ini saat mengelola program-program organisasi.
             </p>
 
-            <form onSubmit={handleCreateProgramCategory} style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Nama kategori program baru (mis. Sosial, Edukasi)"
-                    value={programNewName}
-                    onChange={e => setProgramNewName(e.target.value)}
-                    style={{ maxWidth: '320px' }}
-                />
+            {!showProgramForm ? (
                 <button
-                    type="submit"
+                    onClick={() => setShowProgramForm(true)}
+                    style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     className="btn btn-primary"
-                    disabled={programCreating}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                 >
-                    {programCreating ? (
-                        'Adding...'
-                    ) : (
-                        <>
-                            <Plus size={18} /> Add Program Category
-                        </>
-                    )}
+                    <Plus size={18} /> Add Program Category
                 </button>
-            </form>
+            ) : (
+                <form onSubmit={handleCreateProgramCategory} style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                    <div className={styles.formGroup}>
+                        <label>Category Name *</label>
+                        <input
+                            type="text"
+                            className={styles.input}
+                            placeholder="e.g., Sosial, Pengembangan"
+                            value={programForm.name}
+                            onChange={e => setProgramForm({ ...programForm, name: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                        <label>Slug (optional)</label>
+                        <input
+                            type="text"
+                            className={styles.input}
+                            placeholder="auto-generated"
+                            value={programForm.slug}
+                            onChange={e => setProgramForm({ ...programForm, slug: e.target.value })}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                        <label>Color</label>
+                        <input
+                            type="color"
+                            value={programForm.color}
+                            onChange={e => setProgramForm({ ...programForm, color: e.target.value })}
+                            style={{ width: '60px', height: '40px', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
+                        <button type="submit" className={styles.primaryBtn} disabled={programCreating}>
+                            {programCreating ? 'Creating...' : 'Create Category'}
+                        </button>
+                        <button type="button" onClick={() => setShowProgramForm(false)} className={styles.cancelBtn}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            )}
 
             {programLoading ? (
                 <div className={styles.loading}>Loading program categories...</div>
@@ -495,21 +557,27 @@ export default function CategoriesPage() {
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
                         <div className={styles.colName}>Name</div>
+                        <div className={styles.colEmail}>Slug</div>
+                        <div className={styles.colRole}>Color</div>
                         <div className={styles.colAction}>Action</div>
                     </div>
                     <div className={styles.tableBody}>
                         {programCategories.map(cat => (
-                            <div key={cat} className={styles.tableRow}>
+                            <div key={cat.id} className={styles.tableRow}>
                                 <div className={styles.colName}>
-                                    <strong>{cat}</strong>
+                                    <strong>{cat.name}</strong>
+                                </div>
+                                <div className={styles.colEmail}>{cat.slug}</div>
+                                <div className={styles.colRole}>
+                                    <div style={{ width: '24px', height: '24px', background: cat.color, borderRadius: '4px' }} />
                                 </div>
                                 <div className={styles.colAction}>
                                     <button
-                                        onClick={() => handleDeleteProgramCategory(cat)}
-                                        disabled={programDeleting === cat}
+                                        onClick={() => handleDeleteProgramCategory(cat.id, cat.name)}
+                                        disabled={programDeleting === cat.id}
                                         className={styles.deleteBtn}
                                     >
-                                        {programDeleting === cat ? (
+                                        {programDeleting === cat.id ? (
                                             <Loader size={18} className={styles.spinning} />
                                         ) : (
                                             <Trash2 size={18} />

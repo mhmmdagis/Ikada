@@ -51,7 +51,7 @@ export default function ShareButtons({ url, title, description = '', className =
                     alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 1rem',
-                    background: 'var(--gradient-main, linear-gradient(135deg, #6366f1, #8b5cf6))',
+                    background: 'var(--gradient-main, linear-gradient(135deg, #2ec4b6, #8b5cf6))',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md, 0.5rem)',
@@ -62,7 +62,7 @@ export default function ShareButtons({ url, title, description = '', className =
                 }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(46, 196, 182, 0.4)';
                 }}
                 onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'none';

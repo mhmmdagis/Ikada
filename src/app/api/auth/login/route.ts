@@ -18,14 +18,18 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Email dan password wajib diisi.' }, { status: 400 });
         }
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return NextResponse.json({ error: 'Email atau password salah.' }, { status: 401 });
         }
 
         if (!user.emailVerified) {
-            return NextResponse.json({ error: 'Silakan verifikasi email Anda terlebih dahulu.' }, { status: 401 });
+            return NextResponse.json(
+                { error: 'Silakan verifikasi email Anda terlebih dahulu. Cek inbox/spam untuk link verifikasi.' },
+                { status: 403 }
+            );
         }
 
         const res = NextResponse.json({

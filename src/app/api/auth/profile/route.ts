@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { name, bio, email, username, avatar, instagram, twitter, linkedin, password } = await req.json();
+        const { name, bio, major, batch, email, username, avatar, instagram, twitter, linkedin, password } = await req.json();
 
         // Validate input
         if (!name || name.trim().length === 0) {
@@ -52,6 +52,8 @@ export async function POST(req: NextRequest) {
         const updateData: any = {
             name: name.trim(),
             bio: bio ? bio.trim() : null,
+            major: major?.trim() || null,
+            batch: batch?.trim() || null,
             email: email?.trim() || session.email,
             username: username.trim(),
             avatar: avatar?.trim() || null,
@@ -73,6 +75,8 @@ export async function POST(req: NextRequest) {
                 name: true,
                 email: true,
                 bio: true,
+                major: true,
+                batch: true,
                 avatar: true,
                 username: true,
                 instagram: true,

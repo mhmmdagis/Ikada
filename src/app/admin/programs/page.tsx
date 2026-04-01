@@ -44,9 +44,26 @@ export default function AdminProgramsPage() {
     const [imageError, setImageError] = useState('');
     const imageInputRef = useRef<HTMLInputElement | null>(null);
 
+    const [categories, setCategories] = useState<any[]>([]);
+
     useEffect(() => {
         fetchPrograms();
+        fetchCategories();
     }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const res = await fetch('/api/admin/program-categories');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.categories && Array.isArray(data.categories)) {
+                    setCategories(data.categories);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch categories:', error);
+        }
+    };
 
     const fetchPrograms = async () => {
         try {
@@ -242,13 +259,16 @@ export default function AdminProgramsPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                             <div className={styles.formGroup}>
                                 <label>Category</label>
-                                <input
-                                    type="text"
+                                <select
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    placeholder="e.g., Sosial, Edukasi"
                                     className={styles.input}
-                                />
+                                >
+                                    <option value="">Pilih Kategori</option>
+                                    {categories.map((c: any) => (
+                                        <option key={c.id} value={c.name}>{c.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className={styles.formGroup}>

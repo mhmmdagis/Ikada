@@ -70,7 +70,7 @@ function VerifyEmailForm() {
             }}>
                 {status === 'loading' && (
                     <>
-                        <Loader size={48} style={{ color: '#6366f1', margin: '0 auto 20px' }} className="animate-spin" />
+                        <Loader size={48} style={{ color: '#2ec4b6', margin: '0 auto 20px' }} className="animate-spin" />
                         <h2 style={{ margin: '0 0 10px', color: '#333' }}>Memverifikasi Email...</h2>
                         <p style={{ color: '#666' }}>Mohon tunggu sebentar.</p>
                     </>
@@ -84,7 +84,7 @@ function VerifyEmailForm() {
                         <p style={{ color: '#666', fontSize: '14px' }}>Anda akan diarahkan ke halaman login dalam 3 detik...</p>
                         <Link href="/login" style={{
                             display: 'inline-block',
-                            background: '#6366f1',
+                            background: '#2ec4b6',
                             color: 'white',
                             padding: '10px 20px',
                             borderRadius: '6px',
@@ -103,7 +103,7 @@ function VerifyEmailForm() {
                         <p style={{ color: '#666', marginBottom: '20px' }}>{message}</p>
                         <Link href="/" style={{
                             display: 'inline-block',
-                            background: '#6366f1',
+                            background: '#2ec4b6',
                             color: 'white',
                             padding: '10px 20px',
                             borderRadius: '6px',
@@ -137,7 +137,7 @@ export default function VerifyEmailPage() {
                     width: '100%',
                     boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
                 }}>
-                    <Loader size={48} style={{ color: '#6366f1', margin: '0 auto 20px' }} className="animate-spin" />
+                    <Loader size={48} style={{ color: '#2ec4b6', margin: '0 auto 20px' }} className="animate-spin" />
                     <p style={{ color: '#666' }}>Memverifikasi email...</p>
                 </div>
             </div>

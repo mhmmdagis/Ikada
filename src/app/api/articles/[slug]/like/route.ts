@@ -27,6 +27,7 @@ export async function POST(
         where: {
             userId_articleId: { userId: session.userId, articleId: article.id },
         },
+        select: { id: true },
     });
 
     if (existing) {

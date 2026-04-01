@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import Link from 'next/link';
+import styles from './program.module.css';
 
 export default async function ProgramPage() {
     noStore();
@@ -19,42 +20,51 @@ export default async function ProgramPage() {
     });
 
     return (
-        <div className="container py-12">
-            <h1 className="text-3xl font-bold mb-6">Program Kerja IKADA</h1>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1>Program Kerja IKADA</h1>
+                <p>Dari kegiatan sosial hingga pengembangan profesional, kami merancang program yang relevan dan bermanfaat bagi semua anggota.</p>
+            </div>
 
-            <section className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Program Unggulan Kami</h2>
-                <p className="mb-6">Dari kegiatan sosial hingga pengembangan profesional, kami merancang program yang relevan dan bermanfaat bagi semua anggota.</p>
-
+            <section className={styles.section}>
                 {programs.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className={styles.grid}>
                         {programs.map(program => (
-                            <div key={program.id} className="card flex flex-col">
+                            <div key={program.id} className={styles.card}>
                                 {program.image && (
-                                    <img
-                                        src={program.image}
-                                        alt={program.title}
-                                        className="w-full h-48 object-cover rounded-t-lg"
-                                    />
+                                    <div className={styles.imageWrap}>
+                                        <img
+                                            src={program.image}
+                                            alt={program.title}
+                                            className={styles.image}
+                                        />
+                                    </div>
                                 )}
-                                <div className="p-6 flex-1 flex flex-col">
-                                    <h3 className="text-xl font-semibold mb-2">{program.title}</h3>
-                                    <p className="text-gray-600 mb-4">{program.description}</p>
+                                <div className={styles.content}>
+                                    <h3 className={styles.title}>{program.title}</h3>
+                                    
                                     {program.category && (
-                                        <span className="badge badge-primary mb-3">{program.category}</span>
-                                    )}
-                                    {program.content && (
-                                        <div className="text-sm text-gray-500 mb-3">
-                                            {program.content.substring(0, 150)}...
+                                        <div className={styles.badges}>
+                                            <span className="badge badge-primary">{program.category}</span>
                                         </div>
                                     )}
-                                    <div className="mt-auto flex items-center justify-between gap-2">
-                                        <div className="text-xs text-gray-400">
-                                            Dibuat oleh {program.createdBy.name} • {format(new Date(program.createdAt), 'dd MMM yyyy', { locale: id })}
+
+                                    <p className={styles.description}>{program.description}</p>
+                                    
+                                    {program.content && (
+                                        <div className={styles.excerpt}>
+                                            {program.content.replace(/[#*]/g, '').substring(0, 150)}...
+                                        </div>
+                                    )}
+
+                                    <div className={styles.footer}>
+                                        <div className={styles.meta}>
+                                            <span>Oleh {program.createdBy.name}</span>
+                                            <span>{format(new Date(program.createdAt), 'dd MMM yyyy', { locale: id })}</span>
                                         </div>
                                         <Link
                                             href={`/program/${program.id}`}
-                                            className="btn btn-ghost btn-xs"
+                                            className="btn btn-primary btn-sm"
                                         >
                                             Baca selengkapnya
                                         </Link>
@@ -64,11 +74,11 @@ export default async function ProgramPage() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500">Belum ada program yang tersedia.</p>
+                    <p className={styles.empty}>Belum ada program yang tersedia saat ini.</p>
                 )}
             </section>
 
-            <p className="text-center text-gray-600">Untuk informasi lebih lanjut tentang program kerja IKADA, tetap terhubung dengan komunitas kami.</p>
+            <p className={styles.bottomText}>Untuk informasi lebih lanjut tentang program kerja IKADA, tetap terhubung dengan komunitas kami.</p>
         </div>
     );
 }

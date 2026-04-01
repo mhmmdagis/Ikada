@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession, isAdminRole } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 export async function GET() {
     try {
         const session = await getSession();
 
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -16,7 +16,7 @@ export async function GET() {
 
         return NextResponse.json({
             success: true,
-            categories: categories.map(c => c.name),
+            categories: categories,
         });
     } catch (error) {
         console.error('[GALLERY CATEGORIES GET ERROR]', error);
@@ -28,29 +28,38 @@ export async function POST(req: NextRequest) {
     try {
         const session = await getSession();
 
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const body = await req.json();
         const rawName = (body.name || '').trim();
+        const rawSlug = (body.slug || '').trim();
+        const color = body.color || '#2ec4b6';
 
         if (!rawName) {
             return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
         }
 
         const name = rawName;
+        // Auto-generate slug if not provided
+        const slug = rawSlug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-        const existing = await prisma.galleryCategory.findUnique({
-            where: { name },
+        const existing = await prisma.galleryCategory.findFirst({
+            where: {
+                OR: [
+                    { name },
+                    { slug }
+                ]
+            }
         });
 
         if (existing) {
-            return NextResponse.json({ error: 'Gallery category already exists' }, { status: 400 });
+            return NextResponse.json({ error: 'Gallery category with this name or slug already exists' }, { status: 400 });
         }
 
         const category = await prisma.galleryCategory.create({
-            data: { name },
+            data: { name, slug, color },
         });
 
         return NextResponse.json({ success: true, category }, { status: 201 });
@@ -64,19 +73,19 @@ export async function DELETE(req: NextRequest) {
     try {
         const session = await getSession();
 
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const body = await req.json();
-        const rawName = (body.name || '').trim();
+        const id = body.categoryId || body.id;
 
-        if (!rawName) {
-            return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
+        if (!id) {
+            return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
         }
 
         const deleted = await prisma.galleryCategory.delete({
-            where: { name: rawName },
+            where: { id },
         }).catch(() => null);
 
         if (!deleted) {

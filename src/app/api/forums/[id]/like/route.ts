@@ -27,6 +27,7 @@ export async function POST(
         where: {
             userId_forumId: { userId: session.userId, forumId: forum.id },
         },
+        select: { id: true },
     });
 
     if (existing) {

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-    Activity, BookOpen, MessageSquare, Users, Calendar, Image,
+    Activity, BookOpen, MessageSquare, Users, Calendar, Image as ImageIcon,
     TrendingUp, Clock, ArrowRight, RefreshCw, Download, FileText, Sheet
 } from 'lucide-react';
 import styles from './dashboard.module.css';
@@ -15,8 +15,17 @@ interface ActivityItem {
     description: string;
     createdAt: string;
     date: string;
-    author?: any;
-    category?: any;
+    author?: {
+        id: string;
+        name: string;
+        username?: string;
+        avatar?: string | null;
+    } | null;
+    category?: {
+        id: string;
+        name: string;
+        color?: string | null;
+    } | null;
     url: string;
     icon: string;
     commentsCount?: number;
@@ -33,10 +42,40 @@ interface DashboardStats {
     gallery: number;
 }
 
+interface MyArticle {
+    id: string;
+    title: string;
+    slug: string;
+    createdAt: string;
+    visibility: 'PUBLIC' | 'DRAFT' | 'UNLISTED' | 'PRIVATE';
+    published: boolean;
+    scheduledAt: string | null;
+}
+
+interface MyForum {
+    id: string;
+    title: string;
+    createdAt: string;
+    commentsCount: number;
+}
+
+interface MyComment {
+    id: string;
+    content: string;
+    createdAt: string;
+    article?: { id: string; title: string; slug: string } | null;
+    forum?: { id: string; title: string } | null;
+}
+
 interface DashboardResponse {
     success: boolean;
     activities: ActivityItem[];
     stats: DashboardStats;
+    my?: {
+        articles: MyArticle[];
+        forums: MyForum[];
+        comments: MyComment[];
+    };
     isAdmin: boolean;
     statsType: 'global' | 'personal';
     error?: string;
@@ -45,12 +84,14 @@ interface DashboardResponse {
 export default function DashboardPage() {
     const [activities, setActivities] = useState<ActivityItem[]>([]);
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [my, setMy] = useState<DashboardResponse['my'] | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [statsType, setStatsType] = useState<'global' | 'personal'>('personal');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [exporting, setExporting] = useState(false);
     const [showExportMenu, setShowExportMenu] = useState(false);
+    const [activeMyTab, setActiveMyTab] = useState<'articles' | 'forums' | 'comments'>('articles');
+    const mySectionRef = useRef<HTMLDivElement | null>(null);
 
     const fetchDashboard = async () => {
         try {
@@ -61,12 +102,12 @@ export default function DashboardPage() {
             if (data.success) {
                 setActivities(data.activities);
                 setStats(data.stats);
+                setMy(data.my ?? null);
                 setIsAdmin(data.isAdmin);
-                setStatsType(data.statsType);
             } else {
                 setError(data.error || 'Gagal memuat dashboard');
             }
-        } catch (err) {
+        } catch {
             setError('Terjadi kesalahan saat memuat data');
         } finally {
             setLoading(false);
@@ -95,7 +136,7 @@ export default function DashboardPage() {
             window.URL.revokeObjectURL(url);
             
             setShowExportMenu(false);
-        } catch (err) {
+        } catch {
             alert('Gagal mengekspor data');
         } finally {
             setExporting(false);
@@ -105,6 +146,13 @@ export default function DashboardPage() {
     useEffect(() => {
         fetchDashboard();
     }, []);
+
+    const focusMyTab = (tab: 'articles' | 'forums' | 'comments') => {
+        setActiveMyTab(tab);
+        requestAnimationFrame(() => {
+            mySectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    };
 
     const formatDate = (date: string) => {
         const now = new Date();
@@ -146,6 +194,28 @@ export default function DashboardPage() {
             case 'gallery': return 'Galeri';
             default: return 'Aktivitas';
         }
+    };
+
+    const myTabTitle = useMemo(() => {
+        switch (activeMyTab) {
+            case 'articles': return 'Artikel Saya';
+            case 'forums': return 'Diskusi Saya';
+            case 'comments': return 'Komentar Saya';
+        }
+    }, [activeMyTab]);
+
+    const myTabItemsCount = useMemo(() => {
+        if (!my) return 0;
+        if (activeMyTab === 'articles') return my.articles.length;
+        if (activeMyTab === 'forums') return my.forums.length;
+        return my.comments.length;
+    }, [activeMyTab, my]);
+
+    const getArticleVisibilityLabel = (visibility: MyArticle['visibility'], published: boolean) => {
+        if (visibility === 'PUBLIC') return published ? 'Publik' : 'Draft';
+        if (visibility === 'DRAFT') return 'Draft';
+        if (visibility === 'UNLISTED') return 'Unlisted';
+        return 'Pribadi';
     };
 
     if (loading) {
@@ -213,43 +283,11 @@ export default function DashboardPage() {
                                     Export
                                 </button>
                                 {showExportMenu && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        right: 0,
-                                        marginTop: '0.5rem',
-                                        background: 'white',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '0.375rem',
-                                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                                        zIndex: 10,
-                                        minWidth: '150px',
-                                        overflow: 'hidden'
-                                    }}>
+                                    <div className={styles.exportMenu}>
                                         <button
                                             onClick={() => handleExport('csv')}
                                             disabled={exporting}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                width: '100%',
-                                                padding: '0.75rem 1rem',
-                                                border: 'none',
-                                                background: 'white',
-                                                color: '#475569',
-                                                cursor: exporting ? 'not-allowed' : 'pointer',
-                                                opacity: exporting ? 0.6 : 1,
-                                                textAlign: 'left',
-                                                fontSize: '0.875rem',
-                                                transition: 'background 0.2s'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (!exporting) e.currentTarget.style.background = '#f1f5f9';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.background = 'white';
-                                            }}
+                                            className={styles.exportMenuBtn}
                                         >
                                             <FileText size={16} />
                                             CSV
@@ -257,28 +295,7 @@ export default function DashboardPage() {
                                         <button
                                             onClick={() => handleExport('xlsx')}
                                             disabled={exporting}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                width: '100%',
-                                                padding: '0.75rem 1rem',
-                                                border: 'none',
-                                                background: 'white',
-                                                color: '#475569',
-                                                cursor: exporting ? 'not-allowed' : 'pointer',
-                                                opacity: exporting ? 0.6 : 1,
-                                                textAlign: 'left',
-                                                fontSize: '0.875rem',
-                                                transition: 'background 0.2s',
-                                                borderTop: '1px solid #e2e8f0'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (!exporting) e.currentTarget.style.background = '#f1f5f9';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.background = 'white';
-                                            }}
+                                            className={styles.exportMenuBtn}
                                         >
                                             <Sheet size={16} />
                                             Excel
@@ -286,28 +303,7 @@ export default function DashboardPage() {
                                         <button
                                             onClick={() => handleExport('json')}
                                             disabled={exporting}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                width: '100%',
-                                                padding: '0.75rem 1rem',
-                                                border: 'none',
-                                                background: 'white',
-                                                color: '#475569',
-                                                cursor: exporting ? 'not-allowed' : 'pointer',
-                                                opacity: exporting ? 0.6 : 1,
-                                                textAlign: 'left',
-                                                fontSize: '0.875rem',
-                                                transition: 'background 0.2s',
-                                                borderTop: '1px solid #e2e8f0'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (!exporting) e.currentTarget.style.background = '#f1f5f9';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.background = 'white';
-                                            }}
+                                            className={styles.exportMenuBtn}
                                         >
                                             <FileText size={16} />
                                             JSON
@@ -324,7 +320,7 @@ export default function DashboardPage() {
                 {/* Stats Cards */}
                 {stats && (
                     <div className={styles.statsGrid}>
-                        <div className={styles.statCard}>
+                        <button type="button" className={styles.statCard} onClick={() => focusMyTab('articles')}>
                             <BookOpen size={24} style={{ color: '#3b82f6' }} className={styles.statIcon} />
                             <div>
                                 <div className={styles.statValue}>
@@ -332,9 +328,9 @@ export default function DashboardPage() {
                                 </div>
                                 <div className={styles.statLabel}>{isAdmin ? 'Artikel' : 'Artikel Saya'}</div>
                             </div>
-                        </div>
+                        </button>
 
-                        <div className={styles.statCard}>
+                        <button type="button" className={styles.statCard} onClick={() => focusMyTab('forums')}>
                             <MessageSquare size={24} style={{ color: '#10b981' }} className={styles.statIcon} />
                             <div>
                                 <div className={styles.statValue}>
@@ -342,39 +338,189 @@ export default function DashboardPage() {
                                 </div>
                                 <div className={styles.statLabel}>{isAdmin ? 'Diskusi' : 'Diskusi Saya'}</div>
                             </div>
-                        </div>
+                        </button>
 
-                        <div className={styles.statCard}>
-                            <Users size={24} style={{ color: '#8b5cf6' }} className={styles.statIcon} />
+                        <button type="button" className={styles.statCard} onClick={() => focusMyTab('comments')}>
+                            <Activity size={24} style={{ color: '#8b5cf6' }} className={styles.statIcon} />
                             <div>
                                 <div className={styles.statValue}>
-                                    {stats.users.toLocaleString()}
+                                    {stats.comments.toLocaleString()}
                                 </div>
-                                <div className={styles.statLabel}>Total Pengguna</div>
+                                <div className={styles.statLabel}>{isAdmin ? 'Komentar' : 'Komentar Saya'}</div>
                             </div>
-                        </div>
+                        </button>
 
-                        <div className={styles.statCard}>
-                            <Calendar size={24} style={{ color: '#ef4444' }} className={styles.statIcon} />
-                            <div>
-                                <div className={styles.statValue}>
-                                    {stats.events.toLocaleString()}
+                        {isAdmin && (
+                            <>
+                                <div className={`${styles.statCard} ${styles.statCardStatic}`} role="group" aria-label="Total Pengguna">
+                                    <Users size={24} style={{ color: '#6366f1' }} className={styles.statIcon} />
+                                    <div>
+                                        <div className={styles.statValue}>
+                                            {stats.users.toLocaleString()}
+                                        </div>
+                                        <div className={styles.statLabel}>Total Pengguna</div>
+                                    </div>
                                 </div>
-                                <div className={styles.statLabel}>Total Event</div>
-                            </div>
-                        </div>
 
-                        <div className={styles.statCard}>
-                            <Image size={24} style={{ color: '#f97316' }} className={styles.statIcon} />
-                            <div>
-                                <div className={styles.statValue}>
-                                    {stats.gallery.toLocaleString()}
+                                <div className={`${styles.statCard} ${styles.statCardStatic}`} role="group" aria-label="Total Event">
+                                    <Calendar size={24} style={{ color: '#ef4444' }} className={styles.statIcon} />
+                                    <div>
+                                        <div className={styles.statValue}>
+                                            {stats.events.toLocaleString()}
+                                        </div>
+                                        <div className={styles.statLabel}>Total Event</div>
+                                    </div>
                                 </div>
-                                <div className={styles.statLabel}>{isAdmin ? 'Galeri' : 'Item Galeri'}</div>
-                            </div>
-                        </div>
+
+                                <div className={`${styles.statCard} ${styles.statCardStatic}`} role="group" aria-label="Item Galeri">
+                                    <ImageIcon size={24} style={{ color: '#f97316' }} className={styles.statIcon} />
+                                    <div>
+                                        <div className={styles.statValue}>
+                                            {stats.gallery.toLocaleString()}
+                                        </div>
+                                        <div className={styles.statLabel}>Item Galeri</div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
+
+                {/* My Content (grouped) */}
+                <div className={styles.myCard} ref={mySectionRef}>
+                    <div className={styles.myHeader}>
+                        <div>
+                            <h2 className={styles.myTitle}>{myTabTitle}</h2>
+                            <p className={styles.mySubtitle}>
+                                Menampilkan {myTabItemsCount} item terbaru (klik kartu statistik untuk berpindah cepat).
+                            </p>
+                        </div>
+                        <div className={styles.myTabs} role="tablist" aria-label="Konten Saya">
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={activeMyTab === 'articles'}
+                                className={`${styles.myTabBtn} ${activeMyTab === 'articles' ? styles.myTabActive : ''}`}
+                                onClick={() => setActiveMyTab('articles')}
+                            >
+                                Artikel Saya
+                            </button>
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={activeMyTab === 'forums'}
+                                className={`${styles.myTabBtn} ${activeMyTab === 'forums' ? styles.myTabActive : ''}`}
+                                onClick={() => setActiveMyTab('forums')}
+                            >
+                                Diskusi Saya
+                            </button>
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={activeMyTab === 'comments'}
+                                className={`${styles.myTabBtn} ${activeMyTab === 'comments' ? styles.myTabActive : ''}`}
+                                onClick={() => setActiveMyTab('comments')}
+                            >
+                                Komentar Saya
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={styles.myBody}>
+                        {!my ? (
+                            <div className={styles.myEmpty}>
+                                <p>Data konten belum tersedia.</p>
+                            </div>
+                        ) : activeMyTab === 'articles' ? (
+                            my.articles.length === 0 ? (
+                                <div className={styles.myEmpty}>
+                                    <p>Belum ada artikel. Mulai menulis di <Link href="/writings/new">/writings/new</Link>.</p>
+                                </div>
+                            ) : (
+                                <div className={styles.myList}>
+                                    {my.articles.map((a) => (
+                                        <Link key={a.id} href={`/writings/${a.slug}`} className={styles.myItem}>
+                                            <div className={styles.myItemMain}>
+                                                <div className={styles.myItemTitle}>{a.title}</div>
+                                                <div className={styles.myItemMeta}>
+                                                    <span className={styles.myBadge}>
+                                                        {getArticleVisibilityLabel(a.visibility, a.published)}
+                                                    </span>
+                                                    <span>•</span>
+                                                    <span>{formatDate(a.createdAt)}</span>
+                                                    {a.scheduledAt && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>Terjadwal</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <ArrowRight size={16} className={styles.myArrow} />
+                                        </Link>
+                                    ))}
+                                </div>
+                            )
+                        ) : activeMyTab === 'forums' ? (
+                            my.forums.length === 0 ? (
+                                <div className={styles.myEmpty}>
+                                    <p>Belum ada diskusi. Buat topik baru di <Link href="/forums/new">/forums/new</Link>.</p>
+                                </div>
+                            ) : (
+                                <div className={styles.myList}>
+                                    {my.forums.map((f) => (
+                                        <Link key={f.id} href={`/forums/${f.id}`} className={styles.myItem}>
+                                            <div className={styles.myItemMain}>
+                                                <div className={styles.myItemTitle}>{f.title}</div>
+                                                <div className={styles.myItemMeta}>
+                                                    <span className={styles.myBadge}>{f.commentsCount} komentar</span>
+                                                    <span>•</span>
+                                                    <span>{formatDate(f.createdAt)}</span>
+                                                </div>
+                                            </div>
+                                            <ArrowRight size={16} className={styles.myArrow} />
+                                        </Link>
+                                    ))}
+                                </div>
+                            )
+                        ) : my.comments.length === 0 ? (
+                            <div className={styles.myEmpty}>
+                                <p>Belum ada komentar.</p>
+                            </div>
+                        ) : (
+                            <div className={styles.myList}>
+                                {my.comments.map((c) => {
+                                    const targetUrl = c.article
+                                        ? `/writings/${c.article.slug}#comment-${c.id}`
+                                        : c.forum
+                                            ? `/forums/${c.forum.id}#comment-${c.id}`
+                                            : '/dashboard';
+                                    const location = c.article
+                                        ? `Artikel: ${c.article.title}`
+                                        : c.forum
+                                            ? `Diskusi: ${c.forum.title}`
+                                            : 'Konten';
+                                    return (
+                                        <Link key={c.id} href={targetUrl} className={styles.myItem}>
+                                            <div className={styles.myItemMain}>
+                                                <div className={styles.myItemTitle}>{location}</div>
+                                                <div className={styles.myItemMeta}>
+                                                    <span className={styles.myCommentPreview}>
+                                                        {c.content.length > 120 ? c.content.slice(0, 120) + '…' : c.content}
+                                                    </span>
+                                                </div>
+                                                <div className={styles.myItemMeta}>
+                                                    <span>{formatDate(c.createdAt)}</span>
+                                                </div>
+                                            </div>
+                                            <ArrowRight size={16} className={styles.myArrow} />
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 {/* Activities Feed */}
                 <div className={styles.activitiesCard}>
@@ -392,7 +538,7 @@ export default function DashboardPage() {
                         </div>
                     ) : (
                         <div>
-                            {activities.map((activity, index) => (
+                            {activities.map((activity) => (
                                 <Link
                                     key={activity.id}
                                     href={activity.url}
@@ -441,7 +587,7 @@ export default function DashboardPage() {
                                                 {activity.category && (
                                                     <span
                                                         className={styles.activityCategory}
-                                                        style={{ backgroundColor: activity.category.color }}
+                                                        style={{ backgroundColor: activity.category.color ?? undefined }}
                                                     >
                                                         {activity.category.name}
                                                     </span>

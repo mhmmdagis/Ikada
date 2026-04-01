@@ -29,7 +29,7 @@ export function generateVerificationEmailHtml(token: string) {
       </head>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #6366f1;">Disada</h1>
+          <h1 style="color: #2ec4b6;">Disada</h1>
           <p style="color: #666;">Verifikasi Email Anda</p>
         </div>
 
@@ -39,14 +39,14 @@ export function generateVerificationEmailHtml(token: string) {
 
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verificationUrl}"
-               style="background: #6366f1; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+               style="background: #2ec4b6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
               Verifikasi Email
             </a>
           </div>
 
           <p style="color: #666; font-size: 14px;">
             Jika tombol tidak berfungsi, salin dan tempel link berikut ke browser Anda:<br>
-            <a href="${verificationUrl}" style="color: #6366f1; word-break: break-all;">${verificationUrl}</a>
+            <a href="${verificationUrl}" style="color: #2ec4b6; word-break: break-all;">${verificationUrl}</a>
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export function generatePasswordResetEmailHtml(token: string) {
       </head>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #6366f1;">Disada</h1>
+          <h1 style="color: #2ec4b6;">Disada</h1>
           <p style="color: #666;">Reset Password</p>
         </div>
 
@@ -80,14 +80,14 @@ export function generatePasswordResetEmailHtml(token: string) {
 
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}"
-               style="background: #6366f1; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+               style="background: #2ec4b6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
               Reset Password
             </a>
           </div>
 
           <p style="color: #666; font-size: 14px;">
             Jika tombol tidak berfungsi, salin dan tempel link berikut ke browser Anda:<br>
-            <a href="${resetUrl}" style="color: #6366f1; word-break: break-all;">${resetUrl}</a>
+            <a href="${resetUrl}" style="color: #2ec4b6; word-break: break-all;">${resetUrl}</a>
           </p>
 
           <p style="color: #ff6b6b; font-size: 14px; font-weight: bold;">

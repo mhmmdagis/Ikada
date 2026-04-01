@@ -1,8 +1,13 @@
 .footer {
-    background-color: var(--bg-secondary);
-    border-top: 1px solid var(--border-light);
+    background-color: var(--brand-primary);
     padding-top: 4rem;
     margin-top: 4rem;
+    color: white;
+}
+
+[data-theme="dark"] .footer {
+    background-color: var(--bg-primary);
+    border-top: 1px solid var(--border-light);
 }
 
 .footerGrid {
@@ -29,13 +34,13 @@
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    color: var(--text-primary);
+    color: white;
     display: inline-block;
     margin-bottom: 1rem;
 }
 
 .description {
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 1.5rem;
     max-width: 300px;
 }
@@ -52,23 +57,23 @@
     width: 40px;
     height: 40px;
     border-radius: var(--radius-full);
-    background-color: var(--bg-primary);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-light);
-    transition: all var(--transition-fast);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all var(--ease-fast);
 }
 
 .socials a:hover {
-    background-color: var(--brand-primary);
-    color: white;
-    border-color: var(--brand-primary);
+    background-color: white;
+    color: var(--brand-primary);
+    border-color: white;
     transform: translateY(-2px);
 }
 
 .linkHeader {
     font-size: 1.125rem;
     margin-bottom: 1.5rem;
-    color: var(--text-primary);
+    color: white;
 }
 
 .linkList {
@@ -81,12 +86,12 @@
 }
 
 .linkList a {
-    color: var(--text-secondary);
-    transition: color var(--transition-fast);
+    color: rgba(255, 255, 255, 0.8);
+    transition: color var(--ease-fast);
 }
 
 .linkList a:hover {
-    color: var(--brand-primary);
+    color: white;
 }
 
 .contactLink {
@@ -94,12 +99,63 @@
     align-items: center;
     gap: 0.5rem;
     word-break: break-word;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color var(--ease-fast);
+}
+
+.contactLink:hover {
+    color: white;
 }
 
 .footerBottom {
     padding: 1.5rem 0;
-    border-top: 1px solid var(--border-light);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
-    color: var(--text-tertiary);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.875rem;
+}
+
+[data-theme="dark"] .footerBottom {
+    border-top: 1px solid var(--border-light);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .brand {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .description {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .linkHeader {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .linkList a {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .linkList a:hover {
+    color: var(--brand-primary);
+}
+
+[data-theme="dark"] .contactLink {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .contactLink:hover {
+    color: var(--brand-primary);
+}
+
+[data-theme="dark"] .socials a {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-light);
+}
+
+[data-theme="dark"] .socials a:hover {
+    background-color: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
 }

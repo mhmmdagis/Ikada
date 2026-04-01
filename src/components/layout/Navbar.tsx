@@ -12,6 +12,7 @@ import {
 import styles from './Navbar.module.css';
 
 interface SessionUser {
+    id: string;
     userId: string;
     name: string;
     email: string;
@@ -313,7 +314,7 @@ export default function Navbar() {
                     {/* Brand */}
                     <Link href="/" className={styles.brand}>
                         <div className={styles.brandIcon}>
-                            <Flame size={18} />
+                            <img src="/ikada-logo.png" alt="Disada Logo" draggable="false" />
                         </div>
                         <span>
                             <span className="text-gradient">Disada</span>
@@ -371,13 +372,13 @@ export default function Navbar() {
                                                 </div>
                                             </div>
                                             <hr className="divider" style={{ margin: '0.5rem 0' }} />
-                                            <Link href={`/profile/${user.userId}`} className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                                            <Link href={`/profile/${user.id}`} className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                                                 <User size={15} /> Profil Saya
                                             </Link>
                                             <Link href="/writings/new" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                                                 <PenSquare size={15} /> Buat Tulisan
                                             </Link>
-                                            {user.role === 'ADMIN' && (
+                                            {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
                                                 <Link href="/admin" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                                                     <Settings size={15} /> Admin Panel
                                                 </Link>
@@ -393,7 +394,7 @@ export default function Navbar() {
                         ) : (
                             <div className={styles.authBtns}>
                                 <Link href="/login" className={`btn btn-ghost btn-sm ${styles.hideOnMobile}`}>Masuk</Link>
-                                <Link href="/register" className="btn btn-primary btn-sm">Daftar</Link>
+                                <Link href="/register" className="btn btn-accent btn-sm">Daftar</Link>
                             </div>
                         )}
 
@@ -424,13 +425,13 @@ export default function Navbar() {
                         <hr className="divider" />
                         {user ? (
                             <>
-                                <Link href={`/profile/${user.userId}`} className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                                <Link href={`/profile/${user.id}`} className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
                                     <User size={16} /> Profil Saya
                                 </Link>
                                 <Link href="/writings/new" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
                                     <PenSquare size={16} /> Buat Tulisan
                                 </Link>
-                                {user.role === 'ADMIN' && (
+                                {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
                                     <Link href="/admin" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
                                         <Settings size={16} /> Admin Panel
                                     </Link>
@@ -442,7 +443,7 @@ export default function Navbar() {
                         ) : (
                             <div className={styles.mobileAuthBtns}>
                                 <Link href="/login" className="btn btn-ghost" onClick={() => setMenuOpen(false)}>Masuk</Link>
-                                <Link href="/register" className="btn btn-primary" onClick={() => setMenuOpen(false)}>Daftar</Link>
+                                <Link href="/register" className="btn btn-accent" onClick={() => setMenuOpen(false)}>Daftar</Link>
                             </div>
                         )}
                     </div>

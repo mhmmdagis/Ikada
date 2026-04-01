@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getIronSession } from 'iron-session';
 import type { SessionData } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth';
 
 const sessionOptions = {
     password: process.env.SESSION_SECRET || 'disada-super-secret-key-2024-change-in-prod!',
@@ -19,7 +20,7 @@ export async function middleware(request: NextRequest) {
 
     // Admin routes protection
     if (pathname.startsWith('/admin')) {
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.redirect(new URL('/login?next=' + pathname, request.url));
         }
         return res;

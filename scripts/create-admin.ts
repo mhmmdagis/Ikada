@@ -9,8 +9,9 @@ const prisma = new PrismaClient();
 
 async function createAdmin() {
   try {
-    const email = 'loginbu4t@gmail.com';
-    const name = 'Admin Disada';
+    // Super admin account (one-time)
+    const email = 'agismuhammadabduh296@gmail.com';
+    const name = 'Super Admin Disada';
     const plainPassword = 'admin123'; // ganti setelah login pertama
 
     console.log('Using DATABASE_URL =', process.env.DATABASE_URL);
@@ -29,7 +30,7 @@ async function createAdmin() {
         where: { email },
         data: {
           name,
-          role: 'ADMIN',
+          role: 'SUPER_ADMIN',
           password: passwordHash,
           emailVerified: true,
         },
@@ -70,9 +71,9 @@ async function createAdmin() {
         name,
         email,
         password: passwordHash,
-        role: 'ADMIN',
+        role: 'SUPER_ADMIN',
         emailVerified: true,
-        bio: 'Administrator Disada',
+        bio: 'Super Administrator Disada',
         avatar: '',
         instagram: '',
         twitter: '',

@@ -36,6 +36,7 @@ export default async function ForumDetailPage({ params }: Props) {
             where: {
                 userId_forumId: { userId: session.userId, forumId: forum.id },
             },
+            select: { id: true },
         });
         initialLiked = !!existingLike;
     }

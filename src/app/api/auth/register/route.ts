@@ -12,18 +12,27 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Semua field wajib diisi.' }, { status: 400 });
         }
 
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const normalizedName = String(name).trim();
+
+        // Basic email format validation (avoid sending verification to malformed email)
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+        if (!emailOk) {
+            return NextResponse.json({ error: 'Format email tidak valid.' }, { status: 400 });
+        }
+
         if (password.length < 6) {
             return NextResponse.json({ error: 'Password minimal 6 karakter.' }, { status: 400 });
         }
 
-        const existing = await prisma.user.findUnique({ where: { email } });
+        const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
         if (existing) {
             return NextResponse.json({ error: 'Email sudah terdaftar.' }, { status: 409 });
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
         // use name as username (simple slug) by lowercasing and removing spaces
-        const username = name.trim().toLowerCase().replace(/\s+/g, '_');
+        const username = normalizedName.toLowerCase().replace(/\s+/g, '_');
 
         // Generate verification token
         const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -31,8 +40,8 @@ export async function POST(req: NextRequest) {
         const user = await prisma.user.create({
             data: {
                 username,
-                name,
-                email,
+                name: normalizedName,
+                email: normalizedEmail,
                 password: hashedPassword,
                 role: 'USER',
                 emailVerificationToken: verificationToken,
@@ -41,7 +50,7 @@ export async function POST(req: NextRequest) {
 
         // Send verification email
         const emailHtml = generateVerificationEmailHtml(verificationToken);
-        const emailResult = await sendEmail(email, 'Verifikasi Email - Disada', emailHtml);
+        const emailResult = await sendEmail(normalizedEmail, 'Verifikasi Email - Disada', emailHtml);
 
         if (!emailResult.success) {
             console.error('Failed to send verification email:', emailResult.error);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, isAdminRole } from '@/lib/auth';
 import { unstable_noStore as noStore } from 'next/cache';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +32,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const forum = await prisma.forum.findUnique({ where: { id } });
     if (!forum) return NextResponse.json({ error: 'Tidak ditemukan.' }, { status: 404 });
 
-    if (forum.authorId !== session.userId && session.role !== 'ADMIN') {
+    if (forum.authorId !== session.userId && !isAdminRole(session.role)) {
         return NextResponse.json({ error: 'Tidak diizinkan.' }, { status: 403 });
     }
 

@@ -64,7 +64,9 @@ export async function POST(req: NextRequest) {
     }
 
     const slug = customSlug?.trim() || slugify(title);
-    const isPublic = visibility === 'PUBLIC';
+    // published = true jika visibility PUBLIC atau UNLISTED
+    // published = false jika visibility DRAFT atau PRIVATE
+    const isPublished = visibility && (visibility === 'PUBLIC' || visibility === 'UNLISTED') || !visibility;
     const scheduleDate = scheduledAt ? new Date(scheduledAt) : null;
 
     const article = await prisma.article.create({
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
             metaDescription: metaDescription?.trim() || null,
             tags: tags || [],
             attachments: attachments || [],
-            published: isPublic,
+            published: isPublished,
             authorId: session.userId!,
             categoryId: categoryId || null,
         },

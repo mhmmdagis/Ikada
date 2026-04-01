@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, PenSquare, Send, AlertCircle, Loader, ImageUp } from 'lucide-react';
+import { ArrowLeft, PenSquare, Send, AlertCircle, Loader, ImageUp, Link2, Upload } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import styles from './new.module.css';
 
@@ -40,8 +40,9 @@ export default function NewWritingPage() {
     const router = useRouter();
     const [categories, setCategories] = useState<Category[]>([]);
     const uploadInputRef = useRef<HTMLInputElement | null>(null);
+    const thumbnailFileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [form, setForm] = useState<ArticleFormState>({
+    const [form, setForm] = useState<ArticleFormState>(() => ({
         title: '',
         excerpt: '',
         content: '',
@@ -56,12 +57,14 @@ export default function NewWritingPage() {
         metaDescription: '',
         customSlug: '',
         attachments: [],
-    });
+    }));
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
                 const [showMarkdownHelp, setShowMarkdownHelp] = useState(false);
                 const [uploadingInlineImage, setUploadingInlineImage] = useState(false);
+                const [thumbnailMode, setThumbnailMode] = useState<'url' | 'upload'>('url');
+                const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
 
                 useEffect(() => {
                     fetch('/api/categories').then(r => r.json()).then(setCategories).catch(() => { });
@@ -74,7 +77,22 @@ export default function NewWritingPage() {
                     if (!saved) return;
                     try {
                         const parsed = JSON.parse(saved) as ArticleFormState;
-                        setForm(parsed);
+                        setForm((prev) => ({
+                            title: parsed?.title ?? prev.title ?? '',
+                            excerpt: parsed?.excerpt ?? prev.excerpt ?? '',
+                            content: parsed?.content ?? prev.content ?? '',
+                            categoryId: parsed?.categoryId ?? prev.categoryId ?? '',
+                            tags: parsed?.tags ?? prev.tags ?? '',
+                            thumbnail: parsed?.thumbnail ?? prev.thumbnail ?? '',
+                            visibility: (parsed?.visibility ?? prev.visibility ?? 'PUBLIC') as 'PUBLIC' | 'DRAFT' | 'UNLISTED' | 'PRIVATE',
+                            scheduledAt: parsed?.scheduledAt ?? prev.scheduledAt ?? '',
+                            allowComments: parsed?.allowComments ?? prev.allowComments ?? true,
+                            anonymous: parsed?.anonymous ?? prev.anonymous ?? false,
+                            metaTitle: parsed?.metaTitle ?? prev.metaTitle ?? '',
+                            metaDescription: parsed?.metaDescription ?? prev.metaDescription ?? '',
+                            customSlug: parsed?.customSlug ?? prev.customSlug ?? '',
+                            attachments: Array.isArray(parsed?.attachments) ? parsed.attachments : (prev.attachments ?? []),
+                        }));
                     } catch {
                         // ignore malformed localStorage
                     }
@@ -136,6 +154,12 @@ export default function NewWritingPage() {
 
                 const wordCount = form.content.trim().split(/\s+/).filter(Boolean).length;
                 const readTime = Math.max(1, Math.ceil(wordCount / 200));
+                
+                // Ensure thumbnail value is always a string
+                const thumbnailValue = useMemo(() => {
+                    if (form.thumbnail === null || form.thumbnail === undefined) return '';
+                    return String(form.thumbnail);
+                }, [form.thumbnail]);
 
                 const insertMarkdown = (before: string, after: string = '') => {
                     const textarea = document.getElementById('article-content') as HTMLTextAreaElement;
@@ -200,6 +224,41 @@ export default function NewWritingPage() {
                     }
                 };
 
+                const openThumbnailPicker = () => {
+                    if (uploadingThumbnail) return;
+                    thumbnailFileInputRef.current?.click();
+                };
+
+                const handleUploadThumbnail = async (file: File) => {
+                    setError('');
+                    setUploadingThumbnail(true);
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+
+                        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                        const data = await res.json().catch(() => ({}));
+
+                        if (!res.ok) {
+                            setError(data?.error || 'Upload thumbnail gagal. Silakan login terlebih dahulu.');
+                            return;
+                        }
+
+                        if (!data?.url) {
+                            setError('Upload berhasil, tapi URL tidak ditemukan.');
+                            return;
+                        }
+
+                        setForm((prev) => ({ ...prev, thumbnail: data.url }));
+                    } catch (e) {
+                        console.error(e);
+                        setError('Upload thumbnail gagal. Coba lagi.');
+                    } finally {
+                        setUploadingThumbnail(false);
+                        if (thumbnailFileInputRef.current) thumbnailFileInputRef.current.value = '';
+                    }
+                };
+
                 return (
                     <div className={styles.page}>
                         <div className="container">
@@ -247,7 +306,7 @@ export default function NewWritingPage() {
                                                 type="text"
                                                 className="form-input"
                                                 placeholder="Tuliskan ringkasan singkat artikel kamu..."
-                                                value={form.excerpt}
+                                                value={form.excerpt ?? ''}
                                                 onChange={e => setForm({ ...form, excerpt: e.target.value })}
                                                 maxLength={300}
                                             />
@@ -400,22 +459,72 @@ export default function NewWritingPage() {
                                                 type="text"
                                                 className="form-input"
                                                 placeholder="programming, javascript, ..."
-                                                value={form.tags}
+                                                value={form.tags ?? ''}
                                                 onChange={e => setForm({ ...form, tags: e.target.value })}
                                             />
                                         </div>
 
                                         <div className="form-group">
-                                            <label className="form-label" htmlFor="article-thumbnail">Thumbnail URL (opsional)</label>
-                                            <input
-                                                id="article-thumbnail"
-                                                type="url"
-                                                className="form-input"
-                                                placeholder="https://..."
-                                                value={form.thumbnail}
-                                                onChange={e => setForm({ ...form, thumbnail: e.target.value })}
-                                            />
-                                            <span className="form-hint">Recommended: 1200x630px image URL</span>
+                                            <label className="form-label" htmlFor="article-thumbnail">
+                                                Thumbnail (opsional)
+                                            </label>
+
+                                            <div className={styles.thumbnailMode}>
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.thumbnailModeBtn} ${thumbnailMode === 'url' ? styles.thumbnailModeBtnActive : ''}`}
+                                                    onClick={() => setThumbnailMode('url')}
+                                                >
+                                                    <Link2 size={16} /> URL
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.thumbnailModeBtn} ${thumbnailMode === 'upload' ? styles.thumbnailModeBtnActive : ''}`}
+                                                    onClick={() => setThumbnailMode('upload')}
+                                                >
+                                                    <Upload size={16} /> Upload
+                                                </button>
+                                            </div>
+
+                                            {thumbnailMode === 'url' ? (
+                                                <>
+                                                    <input
+                                                        key="thumbnail-url-input"
+                                                        id="article-thumbnail"
+                                                        type="text"
+                                                        className="form-input"
+                                                        placeholder="https://..."
+                                                        value={thumbnailValue}
+                                                        onChange={e => setForm({ ...form, thumbnail: e.target.value })}
+                                                    />
+                                                    <span className="form-hint">Masukkan link gambar (recommended: 1200x630px)</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <input
+                                                        ref={thumbnailFileInputRef}
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) handleUploadThumbnail(file);
+                                                        }}
+                                                    />
+
+                                                    <button
+                                                        type="button"
+                                                        className={styles.thumbnailUploadBtn}
+                                                        onClick={openThumbnailPicker}
+                                                        disabled={uploadingThumbnail}
+                                                    >
+                                                        {uploadingThumbnail ? <Loader size={16} className={styles.spin} /> : <ImageUp size={16} />}
+                                                        <span>{uploadingThumbnail ? 'Mengupload…' : 'Pilih dari galeri (perangkat)'}</span>
+                                                    </button>
+
+                                                    <span className="form-hint">File akan diupload dan disimpan sebagai URL otomatis</span>
+                                                </>
+                                            )}
                                             
                                             {form.thumbnail && (
                                                 <div style={{
@@ -456,7 +565,7 @@ export default function NewWritingPage() {
                                                 id="article-visibility"
                                                 className="form-select"
                                                 value={form.visibility}
-                                                onChange={e => setForm({ ...form, visibility: e.target.value })}
+                                                onChange={e => setForm({ ...form, visibility: e.target.value as ArticleFormState['visibility'] })}
                                             >
                                                 <option value="PUBLIC">Publik</option>
                                                 <option value="DRAFT">Draft</option>
@@ -471,7 +580,7 @@ export default function NewWritingPage() {
                                                 id="article-schedule"
                                                 type="datetime-local"
                                                 className="form-input"
-                                                value={form.scheduledAt}
+                                                value={form.scheduledAt ?? ''}
                                                 onChange={e => setForm({ ...form, scheduledAt: e.target.value })}
                                             />
                                         </div>
@@ -509,7 +618,7 @@ export default function NewWritingPage() {
                                                 id="article-meta-title"
                                                 type="text"
                                                 className="form-input"
-                                                value={form.metaTitle}
+                                                value={form.metaTitle ?? ''}
                                                 onChange={e => setForm({ ...form, metaTitle: e.target.value })}
                                             />
                                         </div>
@@ -518,7 +627,7 @@ export default function NewWritingPage() {
                                             <textarea
                                                 id="article-meta-desc"
                                                 className="form-textarea"
-                                                value={form.metaDescription}
+                                                value={form.metaDescription ?? ''}
                                                 onChange={e => setForm({ ...form, metaDescription: e.target.value })}
                                                 rows={3}
                                             />
@@ -530,7 +639,7 @@ export default function NewWritingPage() {
                                                 type="text"
                                                 className="form-input"
                                                 placeholder="opsional, tanpa spasi"
-                                                value={form.customSlug}
+                                                value={form.customSlug ?? ''}
                                                 onChange={e => setForm({ ...form, customSlug: e.target.value })}
                                             />
                                         </div>

@@ -45,13 +45,25 @@ export default async function Home() {
       {/* ===== HERO ===== */}
       <section className={styles.hero}>
         <div className="container">
-          <div className={styles.heroContent}>
-            <h1 className={`${styles.heroTitle} animate-fade-up delay-1`}>
-              Selamat Datang di Website Resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten
-            </h1>
-            <p className={`${styles.heroSub} animate-fade-up delay-2`}>
-              Menyatukan Asa, Mempererat Silaturahmi, Bangkit Bersama
-            </p>
+          <div className={styles.heroInner}>
+            <div className={styles.heroContent}>
+              <h1 className={`${styles.heroTitle} animate-fade-up delay-1`}>
+                Selamat Datang di Website Resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten
+              </h1>
+              <p className={`${styles.heroSub} animate-fade-up delay-2`}>
+                Menyatukan Asa, Mempererat Silaturahmi, Bangkit Bersama
+              </p>
+            </div>
+            
+            <div className={`${styles.heroImageWrap} animate-fade-up delay-3`}>
+              <div className={styles.heroImageGlow} />
+              <img 
+                src="/ikada-logo.png" 
+                alt="Logo IKADA" 
+                className={styles.heroImage}
+                draggable="false"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -112,7 +124,7 @@ export default async function Home() {
         <div className="container">
           <div className="section-header animate-fade-up">
             <span className="section-eyebrow">Fitur Kami</span>
-            <h2>3 Pilar <span className="text-gradient">Utama</span> Disada</h2>
+            <h2>4 Pilar <span className="text-gradient">Utama</span> Disada</h2>
             <p>Semua yang kamu butuhkan untuk berkarya, berdiskusi, dan berkembang ada di sini.</p>
           </div>
 
@@ -121,7 +133,7 @@ export default async function Home() {
               {
                 icon: <BookOpen size={28} />,
                 color: 'var(--brand-primary)',
-                bg: 'rgba(99,102,241,.1)',
+                bg: 'rgba(46, 196, 182,.1)',
                 title: 'Ruang Kata',
                 desc: 'Artikel dan opini tajam dari penulis muda. Wadah mengekspresikan pemikiran kritis tentang isu-isu terkini.',
                 link: '/writings',
@@ -130,7 +142,7 @@ export default async function Home() {
               {
                 icon: <MessageSquare size={28} />,
                 color: 'var(--brand-secondary)',
-                bg: 'rgba(236,72,153,.1)',
+                bg: 'rgba(27, 154, 170,.1)',
                 title: 'Ruang Diskusi',
                 desc: 'Forum interaktif untuk bertukar ide. Jangan hanya membaca – ikutlah beropini dalam diskusi yang membangun.',
                 link: '/forums',
@@ -139,7 +151,7 @@ export default async function Home() {
               {
                 icon: <Calendar size={28} />,
                 color: 'var(--brand-accent)',
-                bg: 'rgba(6,182,212,.1)',
+                bg: 'rgba(255, 214, 10,.1)',
                 title: 'Jejak Karya',
                 desc: 'Event, webinar, dan kompetisi terkurasi untuk meningkatkan skill dan jaringan profesional kamu.',
                 link: '/events',
@@ -148,7 +160,7 @@ export default async function Home() {
               {
                 icon: <Star size={28} />,
                 color: 'var(--brand-emerald)',
-                bg: 'rgba(16,185,129,.1)',
+                bg: 'rgba(46, 196, 182,.1)',
                 title: 'Program Kerja',
                 desc: 'Berbagai program sosial dan pengembangan yang dirancang untuk anggota IKADA.',
                 link: '/program',
@@ -196,12 +208,12 @@ export default async function Home() {
                     style={
                       articles[0].thumbnail
                         ? {
-                            backgroundImage: `url(${articles[0].thumbnail})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundRepeat: 'no-repeat',
-                            opacity: 1,
-                          }
+                          backgroundImage: `url(${articles[0].thumbnail})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                          opacity: 1,
+                        }
                         : undefined
                     }
                   />
@@ -309,7 +321,7 @@ export default async function Home() {
                     <h4 className={styles.forumTitle}>{f.title}</h4>
                     <div className={styles.articleMeta}>
                       <AuthorLink href={`/profile/${f.author.id}`} className={styles.metaAuthor} stopPropagation>
-                          {f.author.name}
+                        {f.author.name}
                       </AuthorLink>
                       <span className={styles.metaDot}>·</span>
                       <MessageSquare size={13} />
@@ -339,7 +351,7 @@ export default async function Home() {
               <h2>Siap untuk Memulai Perjalananmu?</h2>
               <p>Bergabunglah dengan ribuan pemuda yang berani bersuara dan berkarya nyata di platform kami.</p>
               <div className={styles.ctaBtns}>
-                <Link href="/register" className="btn btn-primary btn-lg">
+                <Link href="/register" className="btn btn-accent btn-lg">
                   Buat Akun Gratis <ArrowRight size={18} />
                 </Link>
                 <Link href="/writings" className="btn btn-ghost btn-lg">

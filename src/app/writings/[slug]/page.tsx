@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowLeft, Calendar, User, Eye, Heart, Tag } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Eye, Tag } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, isAdminRole } from '@/lib/auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -12,6 +12,7 @@ import ArticleComments from './ArticleComments';
 import LikeButton from '@/components/LikeButton';
 import ShareButtons from '@/components/ShareButtons';
 import ArticleAuthor from '@/components/ArticleAuthor';
+import OwnerActions from './OwnerActions';
 import styles from './reading.module.css';
 
 interface Props {
@@ -54,7 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const articleInclude = {
-    author: true,
+    author: {
+        select: {
+            id: true,
+            name: true,
+            avatar: true,
+        }
+    },
     category: true,
     _count: { select: { likes: true } },
 } as const;
@@ -68,15 +75,34 @@ export default async function ArticleDetailPage({ params }: Props) {
         include: articleInclude,
     });
 
-    if (!article || !article.published) notFound();
+    if (!article) notFound();
 
     const session = await getSession();
+    
+    // Check access permission
+    const isAuthor = session.isLoggedIn && session.userId === article.authorId;
+    const isAdmin = isAuthor || isAdminRole(session.role);
+    
+    // Only author/admin can view unpublished articles
+    if (!article.published && !isAdmin) {
+        notFound();
+    }
+    
+    // Check visibility for published articles
+    if (article.published) {
+        if (article.visibility === 'PRIVATE' && !isAdmin) {
+            notFound();
+        }
+    }
+
+    const canManage = !!(session.isLoggedIn && session.userId && (isAuthor || isAdmin));
     let initialLiked = false;
     if (session.isLoggedIn && session.userId) {
         const existingLike = await prisma.like.findUnique({
             where: {
                 userId_articleId: { userId: session.userId, articleId: article.id },
             },
+            select: { id: true },
         });
         initialLiked = !!existingLike;
     }
@@ -98,8 +124,6 @@ export default async function ArticleDetailPage({ params }: Props) {
         take: 3,
     });
 
-    const paragraphs = article.content.split('\n').filter(p => p.trim());
-
     return (
         <div className={styles.page}>
             {/* Reading Header */}
@@ -114,11 +138,28 @@ export default async function ArticleDetailPage({ params }: Props) {
                     <div className={styles.articleWrap}>
                         {/* Header */}
                         <header className={styles.articleHeader}>
-                            {article.category && (
-                                <Link href={`/writings?cat=${article.category.slug}`} className="badge badge-primary">
-                                    <Tag size={11} /> {article.category.name}
-                                </Link>
-                            )}
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                {article.category && (
+                                    <Link href={`/writings?cat=${article.category.slug}`} className="badge badge-primary">
+                                        <Tag size={11} /> {article.category.name}
+                                    </Link>
+                                )}
+                                {!article.published && (
+                                    <span className="badge badge-warning" style={{ backgroundColor: '#fbbf24', color: '#000' }}>
+                                        DRAFT
+                                    </span>
+                                )}
+                                {article.published && article.visibility === 'UNLISTED' && (
+                                    <span className="badge" style={{ backgroundColor: '#9333ea', color: '#fff' }}>
+                                        UNLISTED
+                                    </span>
+                                )}
+                                {article.anonymous && (
+                                    <span className="badge" style={{ backgroundColor: '#6366f1', color: '#fff' }}>
+                                        ANONIM
+                                    </span>
+                                )}
+                            </div>
                             <h1 className={styles.articleTitle}>{article.title}</h1>
 
                             {/* Meta */}
@@ -139,8 +180,15 @@ export default async function ArticleDetailPage({ params }: Props) {
                                         </div>
                                     ) : (
                                         <Link href={`/profile/${article.author.id}`} className={styles.authorInfoLink}>
-                                            <div className={styles.authorAvatar}>
-                                                {article.author.name.charAt(0).toUpperCase()}
+                                            <div 
+                                                className={styles.authorAvatar}
+                                                style={article.author.avatar ? { 
+                                                    backgroundImage: `url(${article.author.avatar})`,
+                                                    backgroundSize: 'cover',
+                                                    backgroundPosition: 'center'
+                                                } : undefined}
+                                            >
+                                                {!article.author.avatar && article.author.name.charAt(0).toUpperCase()}
                                             </div>
                                             <div>
                                                 <div className={styles.authorName}>{article.author.name}</div>
@@ -164,6 +212,11 @@ export default async function ArticleDetailPage({ params }: Props) {
                                             initialLiked={initialLiked}
                                         />
                                     </span>
+                                    {canManage && (
+                                        <span className={styles.metaStat}>
+                                            <OwnerActions slug={article.slug} />
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </header>
@@ -192,14 +245,16 @@ export default async function ArticleDetailPage({ params }: Props) {
                             {article.excerpt && (
                                 <p className={styles.excerpt}>{article.excerpt}</p>
                             )}
-                            <ReactMarkdown
-                                components={{
-                                    img: ({node, ...props}) =>
-                                        props.src ? <img {...props} /> : null,
-                                }}
-                            >
-                                {article.content}
-                            </ReactMarkdown>
+                            <div className="markdown-content">
+                                <ReactMarkdown
+                                    components={{
+                                        img: ({ ...props }) =>
+                                            props.src ? <img {...props} alt={props.alt || ''} /> : null,
+                                    }}
+                                >
+                                    {article.content}
+                                </ReactMarkdown>
+                            </div>
                         </div>
 
                         {/* Share & Footer */}

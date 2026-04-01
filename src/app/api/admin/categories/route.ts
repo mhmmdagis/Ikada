@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession, isAdminRole } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 export async function GET() {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         const session = await getSession();
 
         // Only admins can create categories
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 401 });
         }
 
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
             data: {
                 name: name.trim(),
                 slug: finalSlug,
-                color: color || '#6366f1',
+                color: color || '#2ec4b6',
             },
         });
 
@@ -67,7 +67,7 @@ export async function DELETE(req: NextRequest) {
     try {
         const session = await getSession();
 
-        if (!session.isLoggedIn || session.role !== 'ADMIN') {
+        if (!session.isLoggedIn || !isAdminRole(session.role)) {
             return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 401 });
         }
 

@@ -24,6 +24,14 @@ export async function getSession(): Promise<IronSession<SessionData>> {
     return getIronSession<SessionData>(cookieStore, sessionOptions);
 }
 
+export function isAdminRole(role?: string) {
+    return role === 'ADMIN' || role === 'SUPER_ADMIN';
+}
+
+export function isSuperAdminRole(role?: string) {
+    return role === 'SUPER_ADMIN';
+}
+
 export async function getSessionFromRequest(req: NextRequest): Promise<IronSession<SessionData>> {
     return getIronSession<SessionData>(req, NextResponse.next(), sessionOptions);
 }

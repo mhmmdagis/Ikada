@@ -1,14 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Mail, Loader } from 'lucide-react';
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [isEmailLocked, setIsEmailLocked] = useState(false);
+
+    useEffect(() => {
+        const paramEmail = searchParams.get('email');
+        if (paramEmail) {
+            setEmail(paramEmail);
+            setIsEmailLocked(true);
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,12 +63,14 @@ export default function ForgotPasswordPage() {
             padding: '20px'
         }}>
             <div style={{
-                background: 'white',
-                borderRadius: '12px',
+                background: 'var(--bg-card)',
+                borderRadius: '16px',
                 padding: '40px',
                 maxWidth: '400px',
                 width: '100%',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                boxShadow: 'var(--shadow-xl)',
+                border: '1px solid var(--border-light)',
+                animation: 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
             }}>
                 <Link href="/login" style={{
                     display: 'inline-flex',
@@ -73,7 +86,7 @@ export default function ForgotPasswordPage() {
                 </Link>
 
                 <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                    <Mail size={48} style={{ color: '#6366f1', margin: '0 auto 20px' }} />
+                    <Mail size={48} style={{ color: '#2ec4b6', margin: '0 auto 20px' }} />
                     <h1 style={{ margin: '0 0 10px', color: '#333' }}>Lupa Password</h1>
                     <p style={{ color: '#666' }}>Masukkan email Anda untuk menerima link reset password.</p>
                 </div>
@@ -125,8 +138,12 @@ export default function ForgotPasswordPage() {
                                 border: '1px solid #d1d5db',
                                 borderRadius: '6px',
                                 fontSize: '16px',
-                                boxSizing: 'border-box'
+                                boxSizing: 'border-box',
+                                backgroundColor: isEmailLocked ? '#f3f4f6' : 'white',
+                                color: isEmailLocked ? '#6b7280' : 'inherit',
+                                cursor: isEmailLocked ? 'not-allowed' : 'text'
                             }}
+                            readOnly={isEmailLocked}
                             disabled={loading}
                             required
                         />
@@ -138,7 +155,7 @@ export default function ForgotPasswordPage() {
                         style={{
                             width: '100%',
                             padding: '12px 16px',
-                            background: '#6366f1',
+                            background: '#2ec4b6',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -163,11 +180,23 @@ export default function ForgotPasswordPage() {
                 </form>
 
                 <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                    <Link href="/login" style={{ color: '#6366f1', textDecoration: 'none', fontSize: '14px' }}>
+                    <Link href="/login" style={{ color: '#2ec4b6', textDecoration: 'none', fontSize: '14px' }}>
                         Ingat password Anda? Login
                     </Link>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ForgotPasswordPage() {
+    return (
+        <Suspense fallback={
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Loader size={30} className="animate-spin" />
+            </div>
+        }>
+            <ForgotPasswordContent />
+        </Suspense>
     );
 }

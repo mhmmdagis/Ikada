@@ -55,7 +55,9 @@ export default function AdminGalleriesPage() {
             const res = await fetch('/api/admin/gallery-categories');
             if (res.ok) {
                 const data = await res.json();
-                setCategories(data.categories);
+                if (data.categories && Array.isArray(data.categories)) {
+                    setCategories(data.categories.map((c: any) => c.name));
+                }
             }
         } catch (error) {
             console.error('Failed to fetch categories:', error);
@@ -163,18 +165,8 @@ export default function AdminGalleriesPage() {
                                 {categories.map((cat) => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
-                                <option value="new">+ Add New Category</option>
                             </select>
                         </div>
-                        {selectedCategory === 'new' && (
-                            <input
-                                type="text"
-                                placeholder="Enter new category name"
-                                value={newCategory}
-                                onChange={(e) => setNewCategory(e.target.value)}
-                                className={styles.input}
-                            />
-                        )}
                     </div>
 
                     <button
