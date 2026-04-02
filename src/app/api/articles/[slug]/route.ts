@@ -27,12 +27,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     noStore();
     const { slug } = await params;
 
-    const session = await getSession();
     const article = await prisma.article.findUnique({ where: { slug } });
     if (!article) return NextResponse.json({ error: 'Tidak ditemukan.' }, { status: 404 });
 
-    const guard = ensureCanManageArticle(session, article.authorId);
-    if (guard) return guard;
+    // Allow public access untuk published articles
+    if (!article.published) {
+        const session = await getSession();
+        if (!session.isLoggedIn || (session.userId !== article.authorId && !isAdminRole(session.role as string))) {
+            return NextResponse.json({ error: 'Tidak diizinkan.' }, { status: 403 });
+        }
+    }
 
     return NextResponse.json(article);
 }
