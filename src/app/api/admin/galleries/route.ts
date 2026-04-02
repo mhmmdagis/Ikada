@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, isAdminRole } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { existsSync } from 'fs';
+import { put } from '@vercel/blob';
 
 export async function GET() {
     try {
@@ -50,21 +48,16 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
-        // Save file
-        const uploadsDir = path.join(process.cwd(), 'public/uploads');
-        if (!existsSync(uploadsDir)) {
-            await mkdir(uploadsDir, { recursive: true });
-        }
-
-        const filename = `${Date.now()}-${file.name}`;
-        const filepath = path.join(uploadsDir, filename);
-        const bytes = await file.arrayBuffer();
-        await writeFile(filepath, Buffer.from(bytes));
+        // Upload to Vercel Blob
+        const filename = `gallery-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${file.name.substring(file.name.lastIndexOf('.') + 1)}`;
+        const blob = await put(filename, file, {
+            access: 'public',
+        });
 
         // Save to database
         const gallery = await prisma.galleryItem.create({
             data: {
-                url: `/uploads/${filename}`,
+                url: blob.url,
                 category: category || null,
                 uploadedById: session.userId!
             },
