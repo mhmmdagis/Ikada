@@ -11,8 +11,16 @@ interface ShareButtonsProps {
 }
 
 const getBaseUrl = () => {
-    if (typeof window !== 'undefined') return window.location.origin;
-    return process.env.NEXT_PUBLIC_SITE_URL || 'https://disada.ikada.id' || 'http://localhost:3000';
+    // Prioritas 1: NEXT_PUBLIC_SITE_URL (production URL)
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+        return process.env.NEXT_PUBLIC_SITE_URL;
+    }
+    // Prioritas 2: Vercel production URL (jika VERCEL_PROJECT_PRODUCTION_URL ada)
+    if (typeof window !== 'undefined' && window.location.hostname === 'vercel.com') {
+        return 'https://disada-ikada.vercel.app';
+    }
+    // Fallback
+    return 'http://localhost:3000';
 };
 
 export default function ShareButtons({ url, title, description = '', className = '' }: ShareButtonsProps) {
