@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
         Tipe: 'Artikel',
         Judul: a.title,
         Kategori: a.category?.name || '-',
-        Penulis: a.anonymous ? 'Anonim' : a.author.name,
+        Penulis: a.anonymous ? 'Anonim' : (a.author?.name || 'User Dihapus'),
         Status: a.published ? 'Publish' : 'Draft',
         Views: a.views,
         'Dibuat Pada': new Date(a.createdAt).toLocaleDateString('id-ID'),
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
         Tipe: 'Diskusi',
         Judul: f.title,
         Kategori: f.category?.name || '-',
-        Penulis: f.author.name,
+        Penulis: f.author?.name || 'User Dihapus',
         Views: f.views,
         Komentar: f._count.comments,
         'Dibuat Pada': new Date(f.createdAt).toLocaleDateString('id-ID'),
@@ -115,7 +115,7 @@ export async function GET(req: NextRequest) {
         Tipe: 'Komentar',
         Konten: c.content.substring(0, 100),
         'Pada': c.article?.title || c.forum?.title || '-',
-        Penulis: c.author.name,
+        Penulis: c.author?.name || 'User Dihapus',
         'Dibuat Pada': new Date(c.createdAt).toLocaleDateString('id-ID')
       })));
     }
