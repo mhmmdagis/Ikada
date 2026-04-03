@@ -17,23 +17,62 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const cat = searchParams.get('cat');
     const q = searchParams.get('q');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const skip = (page - 1) * limit;
 
     const now = new Date();
-    const articles = await prisma.article.findMany({
-        where: {
-            published: true,
-            visibility: 'PUBLIC',
-            AND: [
-                { OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }] },
-            ],
-            ...(cat ? { category: { slug: cat } } : {}),
-            ...(q ? { OR: [{ title: { contains: q } }, { content: { contains: q } }] } : {}),
-        },
-        include: { author: true, category: true, _count: { select: { likes: true } } },
-        orderBy: { createdAt: 'desc' },
-    });
+    const [articles, total] = await Promise.all([
+        prisma.article.findMany({
+            where: {
+                published: true,
+                visibility: 'PUBLIC',
+                AND: [
+                    { OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }] },
+                ],
+                ...(cat ? { category: { slug: cat } } : {}),
+                ...(q ? { OR: [{ title: { contains: q, mode: 'insensitive' } }, { excerpt: { contains: q, mode: 'insensitive' } }] } : {}),
+            },
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                excerpt: true,
+                cover: true,
+                thumbnail: true,
+                published: true,
+                views: true,
+                createdAt: true,
+                author: { select: { id: true, name: true, avatar: true } },
+                category: { select: { id: true, name: true, slug: true, color: true } },
+                _count: { select: { likes: true, comments: true } }
+            },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+            skip: skip,
+        }),
+        prisma.article.count({
+            where: {
+                published: true,
+                visibility: 'PUBLIC',
+                AND: [
+                    { OR: [{ scheduledAt: null }, { scheduledAt: { lte: now } }] },
+                ],
+                ...(cat ? { category: { slug: cat } } : {}),
+                ...(q ? { OR: [{ title: { contains: q, mode: 'insensitive' } }, { excerpt: { contains: q, mode: 'insensitive' } }] } : {}),
+            }
+        })
+    ]);
 
-    return NextResponse.json(articles);
+    return NextResponse.json({
+        data: articles,
+        pagination: {
+            page,
+            limit,
+            total,
+            pages: Math.ceil(total / limit)
+        }
+    });
 }
 
 export async function POST(req: NextRequest) {

@@ -12,7 +12,7 @@ async function createAdmin() {
     // Super admin account (one-time)
     const email = 'agismuhammadabduh296@gmail.com';
     const name = 'Super Admin Disada';
-    const plainPassword = 'admin123'; // ganti setelah login pertama
+    const plainPassword = 'Admin_123';
 
     console.log('Using DATABASE_URL =', process.env.DATABASE_URL);
     console.log('Creating admin for:', email);

@@ -8,21 +8,49 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const cat = searchParams.get('cat');
     const q = searchParams.get('q');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const skip = (page - 1) * limit;
 
-    const forums = await prisma.forum.findMany({
-        where: {
-            ...(cat ? { category: { slug: cat } } : {}),
-            ...(q ? { OR: [{ title: { contains: q } }, { content: { contains: q } }] } : {}),
-        },
-        include: {
-            author: true,
-            category: true,
-            _count: { select: { comments: true, likes: true } },
-        },
-        orderBy: [{ pinned: 'desc' }, { updatedAt: 'desc' }],
+    const [forums, total] = await Promise.all([
+        prisma.forum.findMany({
+            where: {
+                ...(cat ? { category: { slug: cat } } : {}),
+                ...(q ? { OR: [{ title: { contains: q, mode: 'insensitive' } }, { content: { contains: q, mode: 'insensitive' } }] } : {}),
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                views: true,
+                pinned: true,
+                createdAt: true,
+                updatedAt: true,
+                author: { select: { id: true, name: true, avatar: true } },
+                category: { select: { id: true, name: true, slug: true, color: true } },
+                _count: { select: { comments: true, likes: true } },
+            },
+            orderBy: [{ pinned: 'desc' }, { updatedAt: 'desc' }],
+            take: limit,
+            skip: skip,
+        }),
+        prisma.forum.count({
+            where: {
+                ...(cat ? { category: { slug: cat } } : {}),
+                ...(q ? { OR: [{ title: { contains: q, mode: 'insensitive' } }, { content: { contains: q, mode: 'insensitive' } }] } : {}),
+            }
+        })
+    ]);
+
+    return NextResponse.json({
+        data: forums,
+        pagination: {
+            page,
+            limit,
+            total,
+            pages: Math.ceil(total / limit)
+        }
     });
-
-    return NextResponse.json(forums);
 }
 
 export async function POST(req: NextRequest) {

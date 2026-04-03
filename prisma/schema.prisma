@@ -33,6 +33,11 @@ model User {
   programs               Program[]
   createdAt              DateTime      @default(now())
   updatedAt              DateTime      @updatedAt
+
+  @@index([email])
+  @@index([username])
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Category {
@@ -72,6 +77,14 @@ model Article {
   comments        Comment[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([published])
+  @@index([visibility])
+  @@index([createdAt])
+  @@index([anonymous])
 }
 
 model Forum {
@@ -88,6 +101,11 @@ model Forum {
   likes      Like[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([pinned])
+  @@index([createdAt])
 }
 
 model Comment {
@@ -105,6 +123,12 @@ model Comment {
   likes     Like[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([articleId])
+  @@index([forumId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([createdAt])
 }
 
 model Event {
@@ -139,6 +163,10 @@ model Like {
   @@unique([userId, articleId])
   @@unique([userId, forumId])
   @@unique([userId, commentId])
+  @@index([userId])
+  @@index([articleId])
+  @@index([forumId])
+  @@index([commentId])
 }
 
 model GalleryItem {
@@ -150,6 +178,10 @@ model GalleryItem {
   uploadedById String
   uploadedBy   User     @relation(fields: [uploadedById], references: [id])
   createdAt    DateTime @default(now())
+
+  @@index([uploadedById])
+  @@index([categoryId])
+  @@index([createdAt])
 }
 
 model GalleryCategory {
@@ -185,4 +217,9 @@ model Program {
   createdBy   User     @relation(fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([createdById])
+  @@index([createdAt])
 }

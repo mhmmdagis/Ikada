@@ -3,7 +3,7 @@ import { getSession, isAdminRole, isSuperAdminRole } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
         const session = await getSession();
         
@@ -11,26 +11,44 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const users = await prisma.user.findMany({
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                bio: true,
-                createdAt: true,
-                _count: {
-                    select: {
-                        articles: true,
-                        forums: true,
-                        comments: true,
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get('page') || '1');
+        const limit = parseInt(searchParams.get('limit') || '20');
+        const skip = (page - 1) * limit;
+
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    bio: true,
+                    createdAt: true,
+                    _count: {
+                        select: {
+                            articles: true,
+                            forums: true,
+                            comments: true,
+                        },
                     },
                 },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+                skip: skip,
+            }),
+            prisma.user.count()
+        ]);
 
-        return NextResponse.json(users);
+        return NextResponse.json({
+            data: users,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
         console.error('[GET USERS ERROR]', error);
         return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });

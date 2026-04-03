@@ -6,12 +6,41 @@ import prisma from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
-    const items = await prisma.galleryItem.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: { uploadedBy: { select: { id: true, name: true } } }
-    });
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const skip = (page - 1) * limit;
+    const categoryId = searchParams.get('categoryId');
 
-    return NextResponse.json(items);
+    const [items, total] = await Promise.all([
+      prisma.galleryItem.findMany({
+        where: categoryId ? { categoryId } : {},
+        select: {
+          id: true,
+          url: true,
+          category: true,
+          categoryId: true,
+          createdAt: true,
+          uploadedBy: { select: { id: true, name: true } }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: skip,
+      }),
+      prisma.galleryItem.count({
+        where: categoryId ? { categoryId } : {}
+      })
+    ]);
+
+    return NextResponse.json({
+      data: items,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error('[GALLERY GET ERROR]', error);
     return NextResponse.json({ error: 'Failed to fetch gallery' }, { status: 500 });
