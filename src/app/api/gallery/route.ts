@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import prisma from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
@@ -61,12 +60,13 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const category = formData.get('category') as string | null;
+    const categoryId = formData.get('categoryId') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    // Validate file type
     const allowedTypes = [
       'image/jpeg', 'image/png', 'image/gif', 'image/webp',
       'video/mp4', 'video/webm', 'video/ogg'
@@ -75,38 +75,42 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid file type' }, { status: 400 });
     }
 
+    // Validate file size (max 50MB)
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json({ error: 'File too large' }, { status: 400 });
     }
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
+    // Generate unique filename for gallery
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 8);
-    const ext = path.extname(file.name);
-    const filename = `${timestamp}-${randomStr}${ext}`;
-    const filepath = path.join(uploadsDir, filename);
+    const ext = file.name.substring(file.name.lastIndexOf('.'));
+    const filename = `gallery-${timestamp}-${randomStr}${ext}`;
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    fs.writeFileSync(filepath, buffer);
+    // Upload to Vercel Blob Storage
+    const blob = await put(filename, file, {
+      access: 'public',
+    });
 
-    const url = `/uploads/${filename}`;
-
-    // Save record to database
+    // Save record to database with Blob URL
     const gallery = await prisma.galleryItem.create({
       data: {
-        url,
-        category: category || null,
+        url: blob.url,
+        categoryId: categoryId || null,
         uploadedById: user.id
       }
     });
 
-    return NextResponse.json({ success: true, gallery });
+    return NextResponse.json({ 
+      success: true, 
+      gallery: {
+        id: gallery.id,
+        url: gallery.url,
+        categoryId: gallery.categoryId,
+        createdAt: gallery.createdAt,
+        uploadedById: gallery.uploadedById
+      }
+    });
   } catch (error) {
     console.error('[GALLERY POST ERROR]', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
