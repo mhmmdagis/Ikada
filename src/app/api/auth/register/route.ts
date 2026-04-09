@@ -32,7 +32,21 @@ export async function POST(req: NextRequest) {
 
         const hashedPassword = await bcrypt.hash(password, 12);
         // use name as username (simple slug) by lowercasing and removing spaces
-        const username = normalizedName.toLowerCase().replace(/\s+/g, '_');
+        let baseUsername = normalizedName.toLowerCase().replace(/\s+/g, '_');
+        let username = baseUsername;
+        let suffix = 1;
+
+        // Ensure username is unique
+        while (true) {
+            const existingUsername = await prisma.user.findUnique({
+                where: { username },
+            });
+            if (!existingUsername) break;
+            username = `${baseUsername}${suffix++}`;
+            if (suffix > 1000) {
+                return NextResponse.json({ error: 'Gagal membuat username unik.' }, { status: 500 });
+            }
+        }
 
         // Generate verification token
         const verificationToken = crypto.randomBytes(32).toString('hex');
