@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 async function createAdmin() {
   try {
     // Super admin account (one-time)
-    const email = 'agismuhammadabduh296@gmail.com';
+    const email = 'rb.nawawi29@gmail.com';
     const name = 'Super Admin Disada';
     const plainPassword = 'Admin_123';
 

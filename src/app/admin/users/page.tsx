@@ -37,7 +37,8 @@ export default function UsersPage() {
                     router.push('/login');
                     return;
                 }
-                setUsers(await res.json());
+                const data = await res.json();
+                setUsers(data.data || []);
             } catch (error) {
                 console.error('Failed to fetch users:', error);
             } finally {
