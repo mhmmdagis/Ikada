@@ -1,15 +1,17 @@
 import Link from 'next/link';
 import ArticleAuthor from '@/components/ArticleAuthor';
 import AuthorLink from '@/components/AuthorLink';
-import { ArrowRight, BookOpen, MessageSquare, Calendar, Star, Image, Users, TrendingUp } from 'lucide-react';
+import { ArrowRight, BookOpen, MessageSquare, Calendar, Star, Image as ImageIcon, Users, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
 import prisma from '@/lib/prisma';
 import { unstable_noStore as noStore } from 'next/cache';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import styles from './page.module.css';
 
+export const revalidate = 300; // revalidate every 5 minutes
+
 export default async function Home() {
-  noStore();
 
   const [articles, forums, galleryItems, programs, totalUsers] = await Promise.all([
     prisma.article.findMany({
@@ -57,11 +59,14 @@ export default async function Home() {
             
             <div className={`${styles.heroImageWrap} animate-fade-up delay-3`}>
               <div className={styles.heroImageGlow} />
-              <img 
+              <Image 
                 src="/ikada-logo.png" 
                 alt="Logo IKADA" 
+                width={300}
+                height={300}
                 className={styles.heroImage}
-                draggable="false"
+                draggable={false}
+                priority
               />
             </div>
           </div>
@@ -98,11 +103,15 @@ export default async function Home() {
               {programs.map(program => (
                 <div key={program.id} className={styles.programCard}>
                   {program.image && (
-                    <img
-                      src={program.image}
-                      alt={program.title}
-                      className={styles.programImage}
-                    />
+                    <div className={styles.programImageWrap}>
+                      <Image
+                        src={program.image}
+                        alt={program.title}
+                        fill
+                        className={styles.programImage}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
                   )}
                   <div className={styles.programContent}>
                     <h3 className={styles.programTitle}>{program.title}</h3>
@@ -275,11 +284,12 @@ export default async function Home() {
             <div className={styles.galleryGrid}>
               {galleryItems.slice(0, 6).map(item => (
                 <div key={item.id} className={styles.galleryItem}>
-                  <img
+                  <Image
                     src={item.url}
                     alt={item.category || 'Gallery item'}
+                    fill
                     className={styles.galleryImg}
-                    loading="lazy"
+                    sizes="(max-width: 768px) 50vw, 33vw"
                   />
                   <div className={styles.galleryOverlay}>
                     {item.category && (
