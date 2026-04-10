@@ -7,8 +7,10 @@ import { id } from "date-fns/locale";
 import { unstable_noStore as noStore } from "next/cache";
 import { getSession } from "@/lib/auth";
 
+// Revalidate every 1 minute
+export const revalidate = 60;
+
 export default async function ForumsPage() {
-    noStore();
     const [forums, session] = await Promise.all([
         prisma.forum.findMany({
             include: {

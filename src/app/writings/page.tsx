@@ -7,8 +7,10 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import styles from './writings.module.css';
 
+// Revalidate every 1 minute
+export const revalidate = 60;
+
 export default async function WritingsPage({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
-    noStore();
     const { cat } = await searchParams;
 
     const [articles, categories] = await Promise.all([

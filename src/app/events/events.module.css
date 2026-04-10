@@ -82,16 +82,19 @@
 }
 
 .eventImage {
+    position: relative;
     width: 100%;
     height: 200px;
     overflow: hidden;
 }
 
-.eventImage img {
-    width: 100%;
-    height: 100%;
+.imgCover {
     object-fit: cover;
     transition: transform var(--transition-normal);
+}
+
+.eventImage:hover .imgCover {
+    transform: scale(1.05);
 }
 
 .eventImage:hover img {

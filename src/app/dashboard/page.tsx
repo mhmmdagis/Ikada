@@ -15,17 +15,7 @@ export default async function DashboardPage() {
         redirect('/login?next=/dashboard');
     }
 
-    // Get user role
-    const user = await prisma.user.findUnique({
-        where: { id: session.userId },
-        select: { role: true }
-    });
-
-    if (!user) {
-        redirect('/login');
-    }
-
-    const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
+    const isAdmin = session.role === 'ADMIN' || session.role === 'SUPER_ADMIN';
     const limit = 30;
     const myLimit = 10;
 
