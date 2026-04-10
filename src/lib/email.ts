@@ -1,5 +1,7 @@
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
+    console.log('📧 Attempting to send email via Brevo...', { to, subject });
+    
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
@@ -20,19 +22,27 @@ export async function sendEmail(to: string, subject: string, html: string) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Brevo API error:', data);
+      console.error('❌ Brevo API error:', JSON.stringify(data, null, 2));
       return { success: false, error: data };
     }
 
+    console.log('✅ Email sent successfully via Brevo!', { 
+      messageId: data.messageId,
+      to 
+    });
     return { success: true, data };
   } catch (error) {
-    console.error('Email send error:', error);
+    console.error('❌ Email send error:', error);
     return { success: false, error };
   }
 }
 
 export function generateVerificationEmailHtml(token: string) {
-  const verificationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/verify-email?token=${token}`;
+  // Use NEXTAUTH_URL, or VERCEL_URL if in production, or fallback to localhost
+  const baseUrl = process.env.NEXTAUTH_URL 
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    
+  const verificationUrl = `${baseUrl}/auth/verify-email?token=${token}`;
 
   return `
     <!DOCTYPE html>

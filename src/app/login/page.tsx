@@ -12,6 +12,8 @@ export default function LoginPage() {
     const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [resendLoading, setResendLoading] = useState(false);
+    const [resendSuccess, setResendSuccess] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,6 +41,36 @@ export default function LoginPage() {
         }
     };
 
+    const handleResendVerification = async () => {
+        if (!form.email) {
+            setError('Masukkan email Anda terlebih dahulu.');
+            return;
+        }
+
+        setResendLoading(true);
+        setError('');
+        setResendSuccess('');
+
+        try {
+            const res = await fetch('/api/auth/resend-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: form.email }),
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                setResendSuccess('Link verifikasi baru telah dikirim! Cek inbox/spam Anda.');
+            } else {
+                setError(data.error || 'Gagal mengirim ulang email verifikasi.');
+            }
+        } catch {
+            setError('Terjadi kesalahan. Coba lagi.');
+        } finally {
+            setResendLoading(false);
+        }
+    };
+
     return (
         <div className={styles.page}>
             <div className={styles.decorLeft} />
@@ -61,7 +93,46 @@ export default function LoginPage() {
                 {error && (
                     <div className={styles.errorAlert}>
                         <AlertCircle size={16} />
-                        <span>{error}</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            <span>{error}</span>
+                            {error.includes('verifikasi') && (
+                                <button 
+                                    onClick={handleResendVerification}
+                                    disabled={resendLoading}
+                                    style={{ 
+                                        background: 'none', 
+                                        border: 'none', 
+                                        color: 'inherit', 
+                                        textDecoration: 'underline', 
+                                        cursor: 'pointer',
+                                        fontSize: '0.85rem',
+                                        padding: 0,
+                                        textAlign: 'left',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    {resendLoading ? 'Mengirim...' : 'Kirim ulang email verifikasi?'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {resendSuccess && (
+                    <div className={styles.successAlert} style={{ 
+                        backgroundColor: '#ecfdf5', 
+                        color: '#065f46', 
+                        padding: '12px', 
+                        borderRadius: '8px', 
+                        fontSize: '0.9rem', 
+                        marginBottom: '20px',
+                        border: '1px solid #d1fae5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
+                        <span style={{ fontSize: '1.2rem' }}>📧</span>
+                        <span>{resendSuccess}</span>
                     </div>
                 )}
 

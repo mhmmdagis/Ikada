@@ -68,7 +68,14 @@ export async function POST(req: NextRequest) {
 
         if (!emailResult.success) {
             console.error('Failed to send verification email:', emailResult.error);
-            // Still create user but log the error
+            
+            // Delete the user so they can try again (atomic registration)
+            await prisma.user.delete({ where: { id: user.id } });
+            
+            return NextResponse.json({ 
+                error: 'Gagal mengirim email verifikasi. Pastikan konfigurasi Brevo sudah benar.',
+                details: emailResult.error 
+            }, { status: 500 });
         }
 
         return NextResponse.json({
