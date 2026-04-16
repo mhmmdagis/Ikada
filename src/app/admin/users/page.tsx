@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Trash2, Loader } from 'lucide-react';
-import styles from '../manage.module.css';
+import { 
+    ArrowLeft, Trash2, Loader, Plus, Search, 
+    Filter, UserPlus, X, Shield, User, 
+    MessageSquare, BookOpen, Activity 
+} from 'lucide-react';
+import styles from './users.module.css';
 
 interface User {
     id: string;
@@ -28,6 +32,11 @@ export default function UsersPage() {
     const [newAdmin, setNewAdmin] = useState({ name: '', email: '', password: '' });
     const [creating, setCreating] = useState(false);
     const [formError, setFormError] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // Search & Filter state
+    const [searchTerm, setSearchTerm] = useState('');
+    const [roleFilter, setRoleFilter] = useState('ALL');
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -49,8 +58,18 @@ export default function UsersPage() {
         fetchUsers();
     }, [router]);
 
+    const filteredUsers = useMemo(() => {
+        return users.filter(user => {
+            const matchesSearch = 
+                user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
+            return matchesSearch && matchesRole;
+        });
+    }, [users, searchTerm, roleFilter]);
+
     const handleDelete = async (userId: string) => {
-        if (!confirm('Are you sure you want to delete this user?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) return;
 
         setDeleting(userId);
         try {
@@ -90,6 +109,7 @@ export default function UsersPage() {
             } else {
                 setUsers([data.user, ...users]);
                 setNewAdmin({ name: '', email: '', password: '' });
+                setIsModalOpen(false);
             }
         } catch (error) {
             console.error('Failed to create admin:', error);
@@ -99,101 +119,294 @@ export default function UsersPage() {
         }
     };
 
+    const getAvatarColor = (name: string) => {
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899', '#06b6d4'];
+        const index = name.charCodeAt(0) % colors.length;
+        return colors[index];
+    };
+
+    const getInitials = (name: string) => {
+        return name.split(' ').map(n => n[0]).join('').slice(0, 2);
+    };
+
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <Link href="/admin" className={styles.backBtn}>
-                    <ArrowLeft size={20} /> Back
-                </Link>
-                <h1>Manage Users</h1>
-                <Link href="/admin/categories" className={styles.manageBtn}>
-                    Manage Categories
-                </Link>
-            </div>
-
-            <div className={styles.formSection} style={{ marginBottom: '1rem', padding: '.8rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#fff' }}>
-                <h2 style={{ margin: '0 0 .5rem', fontSize: '1rem' }}>Tambah Admin Baru (Super Admin)</h2>
-                <form onSubmit={handleCreateAdmin} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <input
-                        type="text"
-                        placeholder="Nama"
-                        value={newAdmin.name}
-                        onChange={e => setNewAdmin({ ...newAdmin, name: e.target.value })}
-                        required
-                        style={{ flex: '1 1 150px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
-                    />
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={newAdmin.email}
-                        onChange={e => setNewAdmin({ ...newAdmin, email: e.target.value })}
-                        required
-                        style={{ flex: '1 1 200px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={newAdmin.password}
-                        onChange={e => setNewAdmin({ ...newAdmin, password: e.target.value })}
-                        required
-                        style={{ flex: '1 1 180px', padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
-                    />
-                    <button type="submit" className={styles.manageBtn} disabled={creating} style={{ flex: '0 0 auto', padding: '.45rem 1rem' }}>
-                        {creating ? 'Menyimpan...' : 'Buat Admin'}
-                    </button>
-                </form>
-                {formError && <p style={{ color: 'red', marginTop: '.4rem' }}>{formError}</p>}
-            </div>
-
-            {loading ? (
-                <div className={styles.loading}>Loading...</div>
-            ) : (
-                <div className={styles.table}>
-                    <div className={styles.tableHeader}>
-                        <div className={styles.colName}>Name</div>
-                        <div className={styles.colEmail}>Email</div>
-                        <div className={styles.colRole}>Role</div>
-                        <div className={styles.colStats}>Stats</div>
-                        <div className={styles.colAction}>Action</div>
+            <div className={styles.content}>
+                {/* Header Section */}
+                <header className={styles.header}>
+                    <div className={styles.topBar}>
+                        <div className={styles.titleArea}>
+                            <h1 className={`${styles.title} animate-fade-in`}>Manajemen Pengguna</h1>
+                            <p className={`${styles.subtitle} animate-fade-in delay-1`}>
+                                Kelola akses, peran, dan pantau aktivitas pengguna di platform Disada.
+                            </p>
+                        </div>
+                        <div className={`${styles.actions} animate-fade-in delay-2`}>
+                            <Link href="/admin" className={styles.backBtn}>
+                                <ArrowLeft size={18} /> Dashboard
+                            </Link>
+                            <button 
+                                onClick={() => setIsModalOpen(true)}
+                                className={styles.addBtn}
+                            >
+                                <UserPlus size={18} /> Tambah Admin
+                            </button>
+                        </div>
                     </div>
 
-                    <div className={styles.tableBody}>
-                        {users.map(user => (
-                            <div key={user.id} className={styles.tableRow}>
-                                <div className={styles.colName}>
-                                    <strong>{user.name}</strong>
+                    {/* Search & Filter Bar */}
+                    <div className={`${styles.controls} animate-fade-up delay-2 shadow-sm`}>
+                        <div className={styles.searchWrapper}>
+                            <Search className={styles.searchIcon} size={20} />
+                            <input 
+                                type="text" 
+                                placeholder="Cari berdasarkan nama atau email..." 
+                                className={styles.searchInput}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className={styles.filterWrapper}>
+                            <Filter size={18} className={styles.filterIcon} />
+                            <select 
+                                className={styles.filterSelect}
+                                value={roleFilter}
+                                onChange={(e) => setRoleFilter(e.target.value)}
+                            >
+                                <option value="ALL">Semua Peran</option>
+                                <option value="SUPER_ADMIN">Super Admin</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="USER">User</option>
+                            </select>
+                        </div>
+                    </div>
+                </header>
+
+                {loading ? (
+                    <div className={styles.loadingContainer}>
+                        <Loader className={`${styles.spinning} text-brand`} size={48} />
+                        <p>Sinkronisasi Data Pengguna...</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* Desktop Table View */}
+                        <div className={`${styles.tableContainer} animate-scale-in delay-3`}>
+                            <table className={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th>Pengguna</th>
+                                        <th>Peran</th>
+                                        <th>Kontribusi</th>
+                                        <th style={{ textAlign: 'right' }}>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.length > 0 ? (
+                                        filteredUsers.map((user) => (
+                                            <tr key={user.id} className={styles.tableRow}>
+                                                <td>
+                                                    <div className={styles.userInfo}>
+                                                        <div 
+                                                            className={styles.avatar}
+                                                            style={{ backgroundColor: getAvatarColor(user.name) }}
+                                                        >
+                                                            {getInitials(user.name)}
+                                                        </div>
+                                                        <div className={styles.userDetails}>
+                                                            <span className={styles.userName}>{user.name}</span>
+                                                            <span className={styles.userEmail}>{user.email}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span className={`
+                                                        ${styles.badge} 
+                                                        ${user.role === 'SUPER_ADMIN' ? styles.badgeSuperAdmin : 
+                                                          user.role === 'ADMIN' ? styles.badgeAdmin : styles.badgeUser}
+                                                    `}>
+                                                        <span className={`${styles.statusDot} ${user.role === 'SUPER_ADMIN' ? styles.pulse : ''}`}></span>
+                                                        {user.role}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.statsGrid}>
+                                                        <div className={styles.statItem} title="Artikel">
+                                                            <span className={styles.statValue}>{user._count?.articles ?? 0}</span>
+                                                            <span className={styles.statLabel}>Art</span>
+                                                        </div>
+                                                        <div className={styles.statItem} title="Opini">
+                                                            <span className={styles.statValue}>{user._count?.forums ?? 0}</span>
+                                                            <span className={styles.statLabel}>Opn</span>
+                                                        </div>
+                                                        <div className={styles.statItem} title="Komentar">
+                                                            <span className={styles.statValue}>{user._count?.comments ?? 0}</span>
+                                                            <span className={styles.statLabel}>Kom</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.actionBtns}>
+                                                        <button
+                                                            onClick={() => handleDelete(user.id)}
+                                                            disabled={deleting === user.id}
+                                                            className={styles.deleteBtn}
+                                                            title="Hapus Pengguna"
+                                                        >
+                                                            {deleting === user.id ? (
+                                                                <Loader size={18} className={styles.spinning} />
+                                                            ) : (
+                                                                <Trash2 size={18} />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={4} className={styles.noData}>
+                                                Tidak ada pengguna yang sesuai dengan kriteria pencarian.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Cards View */}
+                        <div className={styles.mobileCards}>
+                            {filteredUsers.map((user) => (
+                                <div key={user.id} className={styles.mobileCard}>
+                                    <div className={styles.cardHeader}>
+                                        <div className={styles.userInfo}>
+                                            <div 
+                                                className={styles.avatar}
+                                                style={{ backgroundColor: getAvatarColor(user.name) }}
+                                            >
+                                                {getInitials(user.name)}
+                                            </div>
+                                            <div className={styles.userDetails}>
+                                                <span className={styles.userName}>{user.name}</span>
+                                                <span className={styles.userEmail}>{user.email}</span>
+                                            </div>
+                                        </div>
+                                        <span className={`
+                                            ${styles.badge} 
+                                            ${user.role === 'SUPER_ADMIN' ? styles.badgeSuperAdmin : 
+                                              user.role === 'ADMIN' ? styles.badgeAdmin : styles.badgeUser}
+                                        `}>
+                                            {user.role}
+                                        </span>
+                                    </div>
+                                    <div className={styles.statsGrid}>
+                                        <div className={styles.statItem}>
+                                            <BookOpen size={14} />
+                                            <span className={styles.statValue}>{user._count?.articles ?? 0}</span>
+                                        </div>
+                                        <div className={styles.statItem}>
+                                            <MessageSquare size={14} />
+                                            <span className={styles.statValue}>{user._count?.forums ?? 0}</span>
+                                        </div>
+                                        <div className={styles.statItem}>
+                                            <Activity size={14} />
+                                            <span className={styles.statValue}>{user._count?.comments ?? 0}</span>
+                                        </div>
+                                    </div>
+                                    <div className={styles.cardActions}>
+                                        <button
+                                            onClick={() => handleDelete(user.id)}
+                                            disabled={deleting === user.id}
+                                            className={styles.deleteBtn}
+                                        >
+                                            <Trash2 size={18} /> Hapus
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className={styles.colEmail}>{user.email}</div>
-                                <div className={styles.colRole}>
-                                    <span className={`${styles.badge} ${styles[user.role.toLowerCase()]}`}>
-                                        {user.role}
-                                    </span>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                <p className={styles.summaryInfo}>
+                    Menampilkan <strong>{filteredUsers.length}</strong> pengguna dari total <strong>{users.length}</strong> terdaftar.
+                </p>
+            </div>
+
+            {/* Add Admin Modal */}
+            {isModalOpen && (
+                <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
+                    <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2>Tambah Administrator Baru</h2>
+                            <button className={styles.closeBtn} onClick={() => setIsModalOpen(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateAdmin}>
+                            <div className={styles.modalBody}>
+                                <p className={styles.modalSubtitle}>
+                                    Membuat akun dengan otoritas penuh (Super Admin). Pastikan data yang dimasukkan valid.
+                                </p>
+                                <div className={styles.formGroup}>
+                                    <label>Nama Lengkap</label>
+                                    <input
+                                        type="text"
+                                        className={styles.inputField}
+                                        placeholder="Contoh: Ahmad Fauzi"
+                                        value={newAdmin.name}
+                                        onChange={e => setNewAdmin({ ...newAdmin, name: e.target.value })}
+                                        required
+                                    />
                                 </div>
-                                <div className={styles.colStats}>
-                                    <small>
-                                        {(user._count?.articles ?? 0)} articles • {(user._count?.forums ?? 0)} forums • {(user._count?.comments ?? 0)} comments
-                                    </small>
+                                <div className={styles.formGroup}>
+                                    <label>Alamat Email</label>
+                                    <input
+                                        type="email"
+                                        className={styles.inputField}
+                                        placeholder="admin@disada.id"
+                                        value={newAdmin.email}
+                                        onChange={e => setNewAdmin({ ...newAdmin, email: e.target.value })}
+                                        required
+                                    />
                                 </div>
-                                <div className={styles.colAction}>
-                                    <button
-                                        onClick={() => handleDelete(user.id)}
-                                        disabled={deleting === user.id}
-                                        className={styles.deleteBtn}
-                                    >
-                                        {deleting === user.id ? (
-                                            <Loader size={18} className={styles.spinning} />
-                                        ) : (
-                                            <Trash2 size={18} />
-                                        )}
-                                    </button>
+                                <div className={styles.formGroup}>
+                                    <label>Password</label>
+                                    <input
+                                        type="password"
+                                        className={styles.inputField}
+                                        placeholder="Minimal 8 karakter"
+                                        value={newAdmin.password}
+                                        onChange={e => setNewAdmin({ ...newAdmin, password: e.target.value })}
+                                        required
+                                    />
                                 </div>
+                                {formError && <p className={styles.formError}>{formError}</p>}
                             </div>
-                        ))}
+                            <div className={styles.modalFooter}>
+                                <button 
+                                    type="button" 
+                                    className={styles.backBtn} 
+                                    onClick={() => setIsModalOpen(false)}
+                                >
+                                    Batal
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    className={styles.submitBtn}
+                                    disabled={creating}
+                                >
+                                    {creating ? (
+                                        <><Loader size={18} className={styles.spinning} /> Menyimpan...</>
+                                    ) : (
+                                        'Buat Akun Admin'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
-
-            <p className={styles.info}>Total Users: {users.length}</p>
         </div>
     );
 }
+

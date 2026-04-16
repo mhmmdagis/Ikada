@@ -48,7 +48,7 @@ export default function ArticlesPage() {
     }, [router]);
 
     const handleDelete = async (articleId: string) => {
-        if (!confirm('Are you sure you want to delete this article?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus artikel ini?')) return;
 
         setDeleting(articleId);
         try {
@@ -76,21 +76,21 @@ export default function ArticlesPage() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <Link href="/admin" className={styles.backBtn}>
-                    <ArrowLeft size={20} /> Back
+                    <ArrowLeft size={20} /> Kembali
                 </Link>
-                <h1>Manage Articles</h1>
+                <h1>Kelola Artikel</h1>
             </div>
 
             {loading ? (
-                <div className={styles.loading}>Loading...</div>
+                <div className={styles.loading}>Memuat...</div>
             ) : (
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
-                        <div className={styles.colTitle}>Title</div>
-                        <div className={styles.colAuthor}>Author</div>
+                        <div className={styles.colTitle}>Judul</div>
+                        <div className={styles.colAuthor}>Penulis</div>
                         <div className={styles.colStatus}>Status</div>
-                        <div className={styles.colViews}>Views</div>
-                        <div className={styles.colAction}>Action</div>
+                        <div className={styles.colViews}>Dilihat</div>
+                        <div className={styles.colAction}>Aksi</div>
                     </div>
 
                     <div className={styles.tableBody}>
@@ -108,7 +108,7 @@ export default function ArticlesPage() {
                                     <span className={`${styles.badge} ${article.published ? styles.published : styles.draft}`}>
                                         {article.published ? (
                                             <>
-                                                <Eye size={14} /> Published
+                                                <Eye size={14} /> Terbit
                                             </>
                                         ) : (
                                             <>
@@ -137,7 +137,7 @@ export default function ArticlesPage() {
                 </div>
             )}
 
-            <p className={styles.info}>Total Articles: {articles.length}</p>
+            <p className={styles.info}>Total Artikel: {articles.length}</p>
         </div>
     );
 }

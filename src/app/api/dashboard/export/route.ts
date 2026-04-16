@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
       });
 
       exportData = exportData.concat(forums.map(f => ({
-        Tipe: 'Diskusi',
+        Tipe: 'Berbagi Opini',
         Judul: f.title,
         Kategori: f.category?.name || '-',
         Penulis: f.author?.name || 'User Dihapus',
@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
         Role: u.role,
         'Email Verified': u.emailVerified ? 'Ya' : 'Tidak',
         Artikel: u._count.articles,
-        Diskusi: u._count.forums,
+        'Berbagi Opini': u._count.forums,
         Komentar: u._count.comments,
         'Bergabung': new Date(u.createdAt).toLocaleDateString('id-ID')
       })));

@@ -183,7 +183,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
     const getActivityTypeLabel = (type: string) => {
         switch (type) {
             case 'article': return 'Artikel';
-            case 'forum': return 'Diskusi';
+            case 'forum': return 'Berbagi Opini';
             case 'comment': return 'Komentar';
             case 'user': return 'Pengguna Baru';
             case 'event': return 'Event';
@@ -195,7 +195,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
     const myTabTitle = useMemo(() => {
         switch (activeMyTab) {
             case 'articles': return 'Artikel Saya';
-            case 'forums': return 'Diskusi Saya';
+            case 'forums': return 'Opini Saya';
             case 'comments': return 'Komentar Saya';
         }
     }, [activeMyTab]);
@@ -217,22 +217,22 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
     return (
         <div className={styles.dashboard}>
             {/* Header */}
-            <div className={styles.dashboardHeader}>
+            <div className={`${styles.dashboardHeader} animate-fade-in`}>
                 <div className={styles.dashboardHeaderInner}>
                     <div className={styles.dashboardHeaderContent}>
-                        <div>
+                        <div className="animate-fade-up">
                             <h1 className={styles.dashboardTitle}>
                                 <Activity size={28} className={styles.dashboardTitleIcon} />
                                 Dashboard Aktivitas {isAdmin ? '(Admin)' : '(Saya)'}
                             </h1>
                             <p className={styles.dashboardSubtitle}>
                                 {isAdmin 
-                                    ? 'Semua aktivitas sistem di platform Disada' 
+                                    ? 'Platform Disada' 
                                     : 'Aktivitas pribadi Anda di platform Disada'
                                 }
                             </p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}>
+                        <div className="animate-fade-in delay-2" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }}>
                             <button
                                 onClick={fetchDashboard}
                                 className={styles.refreshButton}
@@ -284,7 +284,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
                 </div>
             </div>
 
-            <div className={styles.dashboardContainer}>
+            <div className={`${styles.dashboardContainer} animate-fade-up delay-1`}>
                 {error && (
                     <div className={styles.errorAlert} style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '8px' }}>
                         {error}
@@ -309,7 +309,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
                             <div className={styles.statValue}>
                                 {stats.forums.toLocaleString()}
                             </div>
-                            <div className={styles.statLabel}>{isAdmin ? 'Diskusi' : 'Diskusi Saya'}</div>
+                            <div className={styles.statLabel}>{isAdmin ? 'Berbagi Opini' : 'Opini Saya'}</div>
                         </div>
                     </button>
 
@@ -384,7 +384,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
                                 className={`${styles.myTabBtn} ${activeMyTab === 'forums' ? styles.myTabActive : ''}`}
                                 onClick={() => setActiveMyTab('forums')}
                             >
-                                Diskusi Saya
+                                Opini Saya
                             </button>
                             <button
                                 type="button"
@@ -436,7 +436,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
                         ) : activeMyTab === 'forums' ? (
                             my.forums.length === 0 ? (
                                 <div className={styles.myEmpty}>
-                                    <p>Belum ada diskusi. Buat topik baru di <Link href="/forums/new">/forums/new</Link>.</p>
+                                    <p>Belum ada opini. Bagikan opini baru di <Link href="/forums/new">/forums/new</Link>.</p>
                                 </div>
                             ) : (
                                 <div className={styles.myList}>
@@ -470,7 +470,7 @@ export default function DashboardContent({ initialData }: DashboardContentProps)
                                     const location = c.article
                                         ? `Artikel: ${c.article.title}`
                                         : c.forum
-                                            ? `Diskusi: ${c.forum.title}`
+                                            ? `Opini: ${c.forum.title}`
                                             : 'Konten';
                                     return (
                                         <Link key={c.id} href={targetUrl} className={styles.myItem}>

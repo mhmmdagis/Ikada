@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthorLink from '@/components/AuthorLink';
 import ArticleAuthor from '@/components/ArticleAuthor';
 import {
-    Search, BookOpen, MessageSquare, Users, Tag, Calendar,
-    User, Clock, ArrowRight, Loader, AlertCircle
+    Search, BookOpen, MessageSquare, Users, Calendar,
+    User, Clock, ArrowRight, Loader, AlertCircle, Hash, Image as ImageIcon
 } from 'lucide-react';
+import styles from './search.module.css';
 
 interface SearchResult {
     articles: any[];
     forums: any[];
     users: any[];
-    categories: any[];
     events: any[];
 }
 
@@ -22,9 +22,10 @@ interface SearchCounts {
     articles: number;
     forums: number;
     users: number;
-    categories: number;
     events: number;
 }
+
+type TabType = 'all' | 'articles' | 'forums' | 'users' | 'events';
 
 function SearchPageContent() {
     const searchParams = useSearchParams();
@@ -36,6 +37,7 @@ function SearchPageContent() {
     const [counts, setCounts] = useState<SearchCounts | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [activeTab, setActiveTab] = useState<TabType>('all');
 
     const performSearch = async (searchTerm: string) => {
         if (!searchTerm.trim() || searchTerm.length < 2) {
@@ -86,633 +88,262 @@ function SearchPageContent() {
         });
     };
 
-    const truncateText = (text: string, maxLength: number = 150) => {
+    const truncateText = (text: string, maxLength: number = 80) => {
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
     };
 
+    const tabs = useMemo(() => [
+        { id: 'all', label: 'Semua', icon: Hash, count: counts ? (counts.articles + counts.forums + counts.users + counts.events) : 0 },
+        { id: 'articles', label: 'Artikel', icon: BookOpen, count: counts?.articles || 0 },
+        { id: 'forums', label: 'Berbagi Opini', icon: MessageSquare, count: counts?.forums || 0 },
+        { id: 'users', label: 'Pengguna', icon: Users, count: counts?.users || 0 },
+        { id: 'events', label: 'Event', icon: Calendar, count: counts?.events || 0 },
+    ], [counts]);
+
     return (
-        <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
-            {/* Header */}
-            <div style={{
-                background: 'white',
-                borderBottom: '1px solid #e2e8f0',
-                padding: '2rem 0',
-                position: 'sticky',
-                top: 0,
-                zIndex: 10
-            }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
-                    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                        <form onSubmit={handleSearch} style={{ position: 'relative' }}>
-                            <Search size={20} style={{
-                                position: 'absolute',
-                                left: '1rem',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#64748b'
-                            }} />
+        <div className={styles.searchPage}>
+            {/* Background Decorations */}
+            <div className={styles.bgBlob1} />
+            <div className={styles.bgBlob2} />
+
+            {/* Header Sticky (Glassmorphism) */}
+            <div className={styles.stickyHeader}>
+                <div className="container">
+                    <div className={styles.searchFormWrapper}>
+                        <form onSubmit={handleSearch} className={styles.searchForm}>
+                            <Search size={24} className={styles.searchIcon} />
                             <input
                                 type="text"
+                                className={styles.searchInput}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Cari artikel, diskusi, pengguna, kategori, event..."
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem 1rem 0.75rem 3rem',
-                                    border: '2px solid #e2e8f0',
-                                    borderRadius: '0.5rem',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s'
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                                placeholder="Cari inspirasi, tulisan, atau opini..."
                             />
                         </form>
                     </div>
                 </div>
             </div>
 
-            {/* Content */}
-            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-                {loading && (
-                    <div style={{ textAlign: 'center', padding: '3rem' }}>
-                        <Loader size={32} style={{ color: '#3b82f6', margin: '0 auto 1rem' }} className="animate-spin" />
-                        <p style={{ color: '#64748b' }}>Mencari...</p>
-                    </div>
-                )}
-
-                {error && (
-                    <div style={{
-                        background: '#fef2f2',
-                        border: '1px solid #fecaca',
-                        borderRadius: '0.5rem',
-                        padding: '1rem',
-                        marginBottom: '2rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                    }}>
-                        <AlertCircle size={20} style={{ color: '#dc2626' }} />
-                        <span style={{ color: '#dc2626' }}>{error}</span>
-                    </div>
-                )}
-
-                {results && counts && (
-                    <div>
-                        {/* Search Summary */}
-                        <div style={{ marginBottom: '2rem' }}>
-                            <h1 style={{
-                                fontSize: '1.5rem',
-                                fontWeight: 'bold',
-                                color: '#1e293b',
-                                marginBottom: '0.5rem'
-                            }}>
-                                Hasil pencarian untuk "{query}"
-                            </h1>
-                            <p style={{ color: '#64748b' }}>
-                                Ditemukan {counts.articles + counts.forums + counts.users + counts.categories + counts.events} hasil
-                            </p>
+            {/* Tab Navigation */}
+            {results && (
+                <div className={styles.tabBar}>
+                    <div className="container">
+                        <div className={styles.tabList}>
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    className={`${styles.tabBtn} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                                    onClick={() => setActiveTab(tab.id as TabType)}
+                                >
+                                    <tab.icon size={18} />
+                                    <span>{tab.label}</span>
+                                    {tab.count > 0 && <span className={styles.tabBadge}>{tab.count}</span>}
+                                </button>
+                            ))}
                         </div>
+                    </div>
+                </div>
+            )}
 
-                        {/* Results by Category */}
-                        <div style={{ display: 'grid', gap: '2rem' }}>
+            {/* Content Results */}
+            <div className="container">
+                <div className={styles.resultsArea}>
+                    {loading && (
+                        <div style={{ textAlign: 'center', padding: '6rem 0' }}>
+                            <Loader size={48} className="animate-spin" style={{ color: 'var(--brand-primary)', margin: '0 auto 2rem' }} />
+                            <h3 style={{ color: 'var(--text-secondary)' }}>Sedang mencari untuk Anda...</h3>
+                        </div>
+                    )}
 
-                            {/* Articles */}
-                            {results.articles.length > 0 && (
-                                <div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '1rem'
-                                    }}>
-                                        <BookOpen size={20} style={{ color: '#3b82f6' }} />
-                                        <h2 style={{
-                                            fontSize: '1.25rem',
-                                            fontWeight: '600',
-                                            color: '#1e293b'
-                                        }}>
-                                            Artikel ({counts.articles})
-                                        </h2>
-                                    </div>
-                                    <div style={{ display: 'grid', gap: '1rem' }}>
-                                        {results.articles.map((article) => (
-                                            <Link
-                                                key={article.id}
-                                                href={`/writings/${article.slug}`}
-                                                style={{
-                                                    display: 'block',
-                                                    background: 'white',
-                                                    border: '1px solid #e2e8f0',
-                                                    borderRadius: '0.5rem',
-                                                    padding: '1.5rem',
-                                                    textDecoration: 'none',
-                                                    transition: 'all 0.2s',
-                                                    cursor: 'pointer'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.borderColor = '#3b82f6';
-                                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.borderColor = '#e2e8f0';
-                                                    e.currentTarget.style.boxShadow = 'none';
-                                                }}
-                                            >
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'flex-start',
-                                                    marginBottom: '0.5rem'
-                                                }}>
-                                                    <h3 style={{
-                                                        fontSize: '1.125rem',
-                                                        fontWeight: '600',
-                                                        color: '#1e293b',
-                                                        margin: 0
-                                                    }}>
-                                                        {article.title}
-                                                    </h3>
-                                                    {article.category && (
-                                                        <span style={{
-                                                            background: article.category.color,
-                                                            color: 'white',
-                                                            padding: '0.25rem 0.5rem',
-                                                            borderRadius: '0.25rem',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: '500'
-                                                        }}>
-                                                            {article.category.name}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {article.excerpt && (
-                                                    <p style={{
-                                                        color: '#64748b',
-                                                        margin: '0.5rem 0',
-                                                        lineHeight: '1.5'
-                                                    }}>
-                                                        {truncateText(article.excerpt)}
-                                                    </p>
-                                                )}
-                                                <div style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '1rem',
-                                                    fontSize: '0.875rem',
-                                                    color: '#64748b'
-                                                }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <User size={14} />
-                                                        <ArticleAuthor author={article.author} anonymous={article.anonymous} stopPropagation />
-                                                    </div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <Clock size={14} />
-                                                        <span>{formatDate(article.createdAt)}</span>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                    {error && (
+                        <div className={styles.emptyContainer} style={{ borderColor: 'var(--error)', background: 'rgba(239, 68, 68, 0.05)' }}>
+                            <AlertCircle size={40} color="#ef4444" style={{ marginBottom: '1rem' }} />
+                            <h3>Ops! Terjadi kesalahan</h3>
+                            <p>{error}</p>
+                        </div>
+                    )}
 
-                            {/* Forums */}
-                            {results.forums.length > 0 && (
-                                <div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '1rem'
-                                    }}>
-                                        <MessageSquare size={20} style={{ color: '#10b981' }} />
-                                        <h2 style={{
-                                            fontSize: '1.25rem',
-                                            fontWeight: '600',
-                                            color: '#1e293b'
-                                        }}>
-                                            Diskusi ({counts.forums})
-                                        </h2>
-                                    </div>
-                                    <div style={{ display: 'grid', gap: '1rem' }}>
-                                        {results.forums.map((forum) => (
-                                            <Link
-                                                key={forum.id}
-                                                href={`/forums/${forum.id}`}
-                                                style={{
-                                                    display: 'block',
-                                                    background: 'white',
-                                                    border: '1px solid #e2e8f0',
-                                                    borderRadius: '0.5rem',
-                                                    padding: '1.5rem',
-                                                    textDecoration: 'none',
-                                                    transition: 'all 0.2s',
-                                                    cursor: 'pointer'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.borderColor = '#10b981';
-                                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.borderColor = '#e2e8f0';
-                                                    e.currentTarget.style.boxShadow = 'none';
-                                                }}
-                                            >
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'flex-start',
-                                                    marginBottom: '0.5rem'
-                                                }}>
-                                                    <h3 style={{
-                                                        fontSize: '1.125rem',
-                                                        fontWeight: '600',
-                                                        color: '#1e293b',
-                                                        margin: 0
-                                                    }}>
-                                                        {forum.title}
-                                                    </h3>
-                                                    {forum.category && (
-                                                        <span style={{
-                                                            background: forum.category.color,
-                                                            color: 'white',
-                                                            padding: '0.25rem 0.5rem',
-                                                            borderRadius: '0.25rem',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: '500'
-                                                        }}>
-                                                            {forum.category.name}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p style={{
-                                                    color: '#64748b',
-                                                    margin: '0.5rem 0',
-                                                    lineHeight: '1.5'
-                                                }}>
-                                                    {truncateText(forum.content.replace(/<[^>]*>/g, ''))}
-                                                </p>
-                                                <div style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '1rem',
-                                                    fontSize: '0.875rem',
-                                                    color: '#64748b'
-                                                }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <User size={14} />
-                                                        <AuthorLink href={`/profile/${forum.author.id}`} stopPropagation>
-                                                            {forum.author.name}
-                                                        </AuthorLink>
-                                                    </div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <MessageSquare size={14} />
-                                                        <span>{forum._count.comments} komentar</span>
-                                                    </div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <Clock size={14} />
-                                                        <span>{formatDate(forum.createdAt)}</span>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                    {results && !loading && (
+                        <>
+                            <div style={{ marginBottom: '3rem', position: 'relative', zIndex: 1 }}>
+                                <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontWeight: 900 }}>
+                                    Hasil untuk <span className="text-gradient">"{query}"</span>
+                                </h1>
+                            </div>
 
-                            {/* Users */}
-                            {results.users.length > 0 && (
-                                <div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '1rem'
-                                    }}>
-                                        <Users size={20} style={{ color: '#8b5cf6' }} />
-                                        <h2 style={{
-                                            fontSize: '1.25rem',
-                                            fontWeight: '600',
-                                            color: '#1e293b'
-                                        }}>
-                                            Pengguna ({counts.users})
-                                        </h2>
+                            {/* Articles Grid Section */}
+                            {(activeTab === 'all' || activeTab === 'articles') && results.articles.length > 0 && (
+                                <section style={{ marginBottom: '4rem' }}>
+                                    <div className={styles.sectionTitle}>
+                                        <BookOpen size={24} color="var(--brand-primary)" />
+                                        <h2>Artikel Pilihan</h2>
                                     </div>
-                                    <div style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                                        gap: '1rem'
-                                    }}>
-                                        {results.users.map((user) => (
-                                            <Link
-                                                key={user.id}
-                                                href={`/profile/${user.id}`}
-                                                style={{
-                                                    display: 'block',
-                                                    background: 'white',
-                                                    border: '1px solid #e2e8f0',
-                                                    borderRadius: '0.5rem',
-                                                    padding: '1.5rem',
-                                                    textDecoration: 'none',
-                                                    transition: 'all 0.2s',
-                                                    cursor: 'pointer'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.borderColor = '#8b5cf6';
-                                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.borderColor = '#e2e8f0';
-                                                    e.currentTarget.style.boxShadow = 'none';
-                                                }}
-                                            >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                    <div style={{
-                                                        width: '3rem',
-                                                        height: '3rem',
-                                                        borderRadius: '50%',
-                                                        background: user.avatar ? `url(${user.avatar})` : '#e2e8f0',
-                                                        backgroundSize: 'cover',
-                                                        backgroundPosition: 'center',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        flexShrink: 0
-                                                    }}>
-                                                        {!user.avatar && (
-                                                            <User size={20} style={{ color: '#64748b' }} />
-                                                        )}
-                                                    </div>
-                                                    <div style={{ flex: 1 }}>
-                                                        <h3 style={{
-                                                            fontSize: '1rem',
-                                                            fontWeight: '600',
-                                                            color: '#1e293b',
-                                                            margin: 0
-                                                        }}>
-                                                            {user.name}
-                                                        </h3>
-                                                        <p style={{
-                                                            color: '#64748b',
-                                                            fontSize: '0.875rem',
-                                                            margin: '0.25rem 0'
-                                                        }}>
-                                                            @{user.username}
-                                                        </p>
-                                                        {user.bio && (
-                                                            <p style={{
-                                                                color: '#64748b',
-                                                                fontSize: '0.875rem',
-                                                                margin: 0,
-                                                                lineHeight: '1.4'
-                                                            }}>
-                                                                {truncateText(user.bio, 80)}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Categories */}
-                            {results.categories.length > 0 && (
-                                <div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '1rem'
-                                    }}>
-                                        <Tag size={20} style={{ color: '#f59e0b' }} />
-                                        <h2 style={{
-                                            fontSize: '1.25rem',
-                                            fontWeight: '600',
-                                            color: '#1e293b'
-                                        }}>
-                                            Kategori ({counts.categories})
-                                        </h2>
-                                    </div>
-                                    <div style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                                        gap: '1rem'
-                                    }}>
-                                        {results.categories.map((category) => (
-                                            <Link
-                                                key={category.id}
-                                                href={`/writings?category=${category.slug}`}
-                                                style={{
-                                                    display: 'block',
-                                                    background: 'white',
-                                                    border: '1px solid #e2e8f0',
-                                                    borderRadius: '0.5rem',
-                                                    padding: '1.5rem',
-                                                    textDecoration: 'none',
-                                                    transition: 'all 0.2s',
-                                                    cursor: 'pointer'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.borderColor = category.color;
-                                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.borderColor = '#e2e8f0';
-                                                    e.currentTarget.style.boxShadow = 'none';
-                                                }}
-                                            >
-                                                <div style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.75rem',
-                                                    marginBottom: '0.5rem'
-                                                }}>
-                                                    <div style={{
-                                                        width: '2rem',
-                                                        height: '2rem',
-                                                        borderRadius: '50%',
-                                                        background: category.color
-                                                    }}></div>
-                                                    <h3 style={{
-                                                        fontSize: '1.125rem',
-                                                        fontWeight: '600',
-                                                        color: '#1e293b',
-                                                        margin: 0
-                                                    }}>
-                                                        {category.name}
-                                                    </h3>
-                                                </div>
-                                                <p style={{
-                                                    color: '#64748b',
-                                                    fontSize: '0.875rem',
-                                                    margin: 0
-                                                }}>
-                                                    {category._count.articles} artikel • {category._count.forums} diskusi
-                                                </p>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Events */}
-                            {results.events.length > 0 && (
-                                <div>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        marginBottom: '1rem'
-                                    }}>
-                                        <Calendar size={20} style={{ color: '#ef4444' }} />
-                                        <h2 style={{
-                                            fontSize: '1.25rem',
-                                            fontWeight: '600',
-                                            color: '#1e293b'
-                                        }}>
-                                            Event ({counts.events})
-                                        </h2>
-                                    </div>
-                                    <div style={{ display: 'grid', gap: '1rem' }}>
-                                        {results.events.map((event) => (
-                                            <Link
-                                                key={event.id}
-                                                href={`/events`}
-                                                style={{
-                                                    display: 'block',
-                                                    background: 'white',
-                                                    border: '1px solid #e2e8f0',
-                                                    borderRadius: '0.5rem',
-                                                    padding: '1.5rem',
-                                                    textDecoration: 'none',
-                                                    transition: 'all 0.2s',
-                                                    cursor: 'pointer'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.borderColor = '#ef4444';
-                                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.borderColor = '#e2e8f0';
-                                                    e.currentTarget.style.boxShadow = 'none';
-                                                }}
-                                            >
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'flex-start',
-                                                    marginBottom: '0.5rem'
-                                                }}>
-                                                    <h3 style={{
-                                                        fontSize: '1.125rem',
-                                                        fontWeight: '600',
-                                                        color: '#1e293b',
-                                                        margin: 0
-                                                    }}>
-                                                        {event.title}
-                                                    </h3>
-                                                    <span style={{
-                                                        background: '#ef4444',
-                                                        color: 'white',
-                                                        padding: '0.25rem 0.5rem',
-                                                        borderRadius: '0.25rem',
-                                                        fontSize: '0.75rem',
-                                                        fontWeight: '500'
-                                                    }}>
-                                                        Event
-                                                    </span>
-                                                </div>
-                                                {event.description && (
-                                                    <p style={{
-                                                        color: '#64748b',
-                                                        margin: '0.5rem 0',
-                                                        lineHeight: '1.5'
-                                                    }}>
-                                                        {truncateText(event.description)}
-                                                    </p>
-                                                )}
-                                                <div style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '1rem',
-                                                    fontSize: '0.875rem',
-                                                    color: '#64748b'
-                                                }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <User size={14} />
-                                                        <span>{event.organizer.name}</span>
-                                                    </div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <Calendar size={14} />
-                                                        <span>{formatDate(event.date)}</span>
-                                                    </div>
-                                                    {event.location && (
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                            <span>📍 {event.location}</span>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                                        {results.articles.map((article, i) => (
+                                            <Link key={article.id} href={`/writings/${article.slug}`} className={`${styles.articleCard} reveal-fade-up`} style={{ '--reveal-delay': `${i * 50}ms` } as any}>
+                                                <div className={styles.cardImgWrap}>
+                                                    {article.thumbnail ? (
+                                                        <img src={article.thumbnail} alt={article.title} className={styles.thumbnailImg} />
+                                                    ) : (
+                                                        <div className={styles.placeholderImg}>
+                                                            <ImageIcon size={32} />
                                                         </div>
                                                     )}
                                                 </div>
+                                                <div className={styles.cardBody}>
+                                                    {article.category && (
+                                                        <span className={styles.cardCategory} style={{ color: article.category.color }}>
+                                                            {article.category.name}
+                                                        </span>
+                                                    )}
+                                                    <h3 className={styles.cardTitle}>{article.title}</h3>
+                                                    <p className={styles.cardExcerpt}>
+                                                        {truncateText(article.excerpt || '')}
+                                                    </p>
+                                                    <div className={styles.cardFooter}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <div className={styles.authorAvatarMini}>
+                                                                {article.author.avatar ? <img src={article.author.avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <User size={14} />}
+                                                            </div>
+                                                            <ArticleAuthor author={article.author} anonymous={article.anonymous} stopPropagation />
+                                                        </div>
+                                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{formatDate(article.createdAt)}</span>
+                                                    </div>
+                                                </div>
                                             </Link>
                                         ))}
                                     </div>
+                                </section>
+                            )}
+
+                            {/* Discussions Section */}
+                            {(activeTab === 'all' || activeTab === 'forums') && results.forums.length > 0 && (
+                                <section style={{ marginBottom: '4rem' }}>
+                                    <div className={styles.sectionTitle}>
+                                        <MessageSquare size={24} color="#10b981" />
+                                        <h2>Berbagi Opini Terkini</h2>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                                        {results.forums.map((forum, i) => (
+                                            <Link key={forum.id} href={`/forums/${forum.id}`} className={`${styles.articleCard} reveal-fade-up`} style={{ '--reveal-delay': `${i * 50}ms` } as any}>
+                                                <div className={styles.cardImgPlaceholder}>
+                                                    <div className={styles.meshPattern} />
+                                                    <MessageSquare size={40} className={styles.meshIcon} />
+                                                </div>
+                                                <div className={styles.cardBody}>
+                                                    {forum.category && (
+                                                        <span className={styles.cardCategory} style={{ color: forum.category.color }}>
+                                                            {forum.category.name}
+                                                        </span>
+                                                    )}
+                                                    <h3 className={styles.cardTitle}>{forum.title}</h3>
+                                                    <p className={styles.cardExcerpt}>{truncateText(forum.content.replace(/<[^>]*>/g, ''))}</p>
+                                                    <div className={styles.cardFooter}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <User size={14} color="var(--text-tertiary)" />
+                                                            <AuthorLink href={`/profile/${forum.author.id}`} stopPropagation>
+                                                                {forum.author.name}
+                                                            </AuthorLink>
+                                                        </div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: 'var(--text-tertiary)', fontSize: '0.75rem' }}>
+                                                            <MessageSquare size={14} />
+                                                            <span>{forum._count.comments}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Users Grid Section */}
+                            {(activeTab === 'all' || activeTab === 'users') && results.users.length > 0 && (
+                                <section style={{ marginBottom: '4rem' }}>
+                                    <div className={styles.sectionTitle}>
+                                        <Users size={24} color="#8b5cf6" />
+                                        <h2>Kreator & Penulis</h2>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem' }}>
+                                        {results.users.map((user, i) => (
+                                            <Link key={user.id} href={`/profile/${user.id}`} className={`${styles.userCard} reveal-fade-up`} style={{ '--reveal-delay': `${i * 40}ms` } as any}>
+                                                <div 
+                                                    className={styles.userAvatar}
+                                                    style={{ backgroundImage: user.avatar ? `url(${user.avatar})` : 'none', backgroundColor: 'var(--bg-secondary)' }}
+                                                >
+                                                    {!user.avatar && <User size={32} color="var(--text-muted)" />}
+                                                </div>
+                                                <div>
+                                                    <div className={styles.userName}>{user.name}</div>
+                                                    <div className={styles.userUsername}>@{user.username}</div>
+                                                </div>
+                                                <div className="badge badge-primary" style={{ marginTop: '0.5rem' }}>Profil</div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Events Section (Visual) */}
+                            {(activeTab === 'all' || activeTab === 'events') && results.events.length > 0 && (
+                                <section style={{ marginBottom: '4rem' }}>
+                                    <div className={styles.sectionTitle}>
+                                        <Calendar size={24} color="#ef4444" />
+                                        <h2>Agenda & Event</h2>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                                        {results.events.map((event, i) => (
+                                            <Link key={event.id} href={`/events`} className={`${styles.articleCard} reveal-fade-up`} style={{ '--reveal-delay': `${i * 50}ms` } as any}>
+                                                <div className={styles.cardImgWrap}>
+                                                    {event.image ? (
+                                                        <img src={event.image} alt={event.title} className={styles.thumbnailImg} />
+                                                    ) : (
+                                                        <div className={styles.placeholderImg}>
+                                                            <Calendar size={32} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className={styles.cardBody}>
+                                                    <div className="badge" style={{ marginBottom: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>Event</div>
+                                                    <h3 className={styles.cardTitle}>{event.title}</h3>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <Clock size={16} />
+                                                            <span>{formatDate(event.date)}</span>
+                                                        </div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <User size={16} />
+                                                            <span>By {event.organizer || 'Disada'}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Global No Results handling */}
+                            {results && (results.articles.length + results.forums.length + results.users.length + results.events.length) === 0 && (
+                                <div className={styles.emptyContainer}>
+                                    <Search size={64} className={styles.emptyIcon} />
+                                    <h3>Kami Tidak Menemukan "{query}"</h3>
+                                    <p>Mungkin coba kata kunci lain atau cek ejaan Anda? Jangan menyerah!</p>
+                                    <button onClick={() => setSearchQuery('')} className="btn btn-primary" style={{ marginTop: '2rem' }}>Bersihkan Pencarian</button>
                                 </div>
                             )}
+                        </>
+                    )}
+
+                    {!results && !loading && !error && (
+                        <div className={styles.emptyContainer}>
+                            <Search size={80} className={styles.emptyIcon} />
+                            <h2 style={{ fontWeight: 800 }}>Mulai Petualangan Anda</h2>
+                            <p style={{ maxWidth: '400px', margin: '0 auto' }}>Temukan artikel mendalam, opini hangat, dan komunitas yang menginspirasi di seluruh platform Disada.</p>
                         </div>
-
-                        {/* No Results */}
-                        {counts.articles === 0 && counts.forums === 0 && counts.users === 0 &&
-                         counts.categories === 0 && counts.events === 0 && !loading && (
-                            <div style={{
-                                textAlign: 'center',
-                                padding: '4rem 2rem',
-                                background: 'white',
-                                borderRadius: '0.5rem',
-                                border: '1px solid #e2e8f0'
-                            }}>
-                                <Search size={48} style={{ color: '#cbd5e1', margin: '0 auto 1rem' }} />
-                                <h3 style={{
-                                    fontSize: '1.25rem',
-                                    fontWeight: '600',
-                                    color: '#475569',
-                                    margin: '0 0 0.5rem'
-                                }}>
-                                    Tidak ada hasil
-                                </h3>
-                                <p style={{ color: '#64748b', margin: 0 }}>
-                                    Coba kata kunci yang berbeda atau periksa ejaan Anda.
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {!results && !loading && !error && query && (
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '4rem 2rem',
-                        background: 'white',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #e2e8f0'
-                    }}>
-                        <Search size={48} style={{ color: '#cbd5e1', margin: '0 auto 1rem' }} />
-                        <h3 style={{
-                            fontSize: '1.25rem',
-                            fontWeight: '600',
-                            color: '#475569',
-                            margin: '0 0 0.5rem'
-                        }}>
-                            Mulai pencarian
-                        </h3>
-                        <p style={{ color: '#64748b', margin: 0 }}>
-                            Masukkan minimal 2 karakter untuk mencari artikel, diskusi, pengguna, kategori, dan event.
-                        </p>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -721,16 +352,10 @@ function SearchPageContent() {
 export default function SearchPage() {
     return (
         <Suspense fallback={
-            <div style={{
-                minHeight: '100vh',
-                background: '#f8fafc',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
+            <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <Loader size={32} style={{ color: '#3b82f6', margin: '0 auto 1rem' }} className="animate-spin" />
-                    <p style={{ color: '#64748b' }}>Memuat halaman pencarian...</p>
+                    <div className="skeleton" style={{ width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto 2rem' }} />
+                    <p style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>Menyiapkan mesin pencari...</p>
                 </div>
             </div>
         }>

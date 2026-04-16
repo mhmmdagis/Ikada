@@ -20,7 +20,7 @@ export async function POST(
     });
 
     if (!forum) {
-        return NextResponse.json({ error: 'Diskusi tidak ditemukan.' }, { status: 404 });
+        return NextResponse.json({ error: 'Opini tidak ditemukan.' }, { status: 404 });
     }
 
     const existing = await prisma.like.findUnique({

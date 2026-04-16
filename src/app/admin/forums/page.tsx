@@ -49,7 +49,7 @@ export default function ForumsPage() {
     }, [router]);
 
     const handleDelete = async (forumId: string) => {
-        if (!confirm('Are you sure you want to delete this forum and all its comments?'))
+        if (!confirm('Apakah Anda yakin ingin menghapus opini ini dan semua komentarnya?'))
             return;
 
         setDeleting(forumId);
@@ -78,20 +78,20 @@ export default function ForumsPage() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <Link href="/admin" className={styles.backBtn}>
-                    <ArrowLeft size={20} /> Back
+                    <ArrowLeft size={20} /> Kembali
                 </Link>
-                <h1>Manage Forums</h1>
+                <h1>Kelola Berbagi Opini</h1>
             </div>
 
             {loading ? (
-                <div className={styles.loading}>Loading...</div>
+                <div className={styles.loading}>Memuat...</div>
             ) : (
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
-                        <div className={styles.colTitle}>Title</div>
-                        <div className={styles.colAuthor}>Author</div>
-                        <div className={styles.colComments}>Comments</div>
-                        <div className={styles.colAction}>Action</div>
+                        <div className={styles.colTitle}>Judul</div>
+                        <div className={styles.colAuthor}>Penulis</div>
+                        <div className={styles.colComments}>Komentar</div>
+                        <div className={styles.colAction}>Aksi</div>
                     </div>
 
                     <div className={styles.tableBody}>
@@ -127,7 +127,7 @@ export default function ForumsPage() {
                 </div>
             )}
 
-            <p className={styles.info}>Total Forums: {forums.length}</p>
+            <p className={styles.info}>Total Opini: {forums.length}</p>
         </div>
     );
 }

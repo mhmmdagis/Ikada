@@ -13,15 +13,14 @@ export async function GET(req: NextRequest) {
           articles: [],
           forums: [],
           users: [],
-          categories: [],
           events: []
         },
         total: 0
       });
     }
 
-    // Search in multiple models simultaneously
-    const [articles, forums, users, categories, events] = await Promise.all([
+    // Search in multiple models simultaneously (Categories removed per user request)
+    const [articles, forums, users, events] = await Promise.all([
       // Search articles
       prisma.article.findMany({
         where: {
@@ -36,6 +35,7 @@ export async function GET(req: NextRequest) {
           title: true,
           slug: true,
           excerpt: true,
+          thumbnail: true,
           anonymous: true,
           createdAt: true,
           author: {
@@ -59,12 +59,17 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' }
       }),
 
-      // Search forums
+      // Search forums (Improved with author name search)
       prisma.forum.findMany({
         where: {
           OR: [
             { title: { contains: query, mode: 'insensitive' } },
-            { content: { contains: query, mode: 'insensitive' } }
+            { content: { contains: query, mode: 'insensitive' } },
+            { 
+              author: { 
+                name: { contains: query, mode: 'insensitive' } 
+              } 
+            }
           ]
         },
         select: {
@@ -121,36 +126,14 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' }
       }),
 
-      // Search categories
-      prisma.category.findMany({
-        where: {
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { slug: { contains: query, mode: 'insensitive' } }
-          ]
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          color: true,
-          _count: {
-            select: {
-              articles: true,
-              forums: true
-            }
-          }
-        },
-        take: 5
-      }),
-
       // Search events
       prisma.event.findMany({
         where: {
           OR: [
             { title: { contains: query, mode: 'insensitive' } },
             { description: { contains: query, mode: 'insensitive' } },
-            { location: { contains: query, mode: 'insensitive' } }
+            { location: { contains: query, mode: 'insensitive' } },
+            { organizer: { contains: query, mode: 'insensitive' } }
           ]
         },
         select: {
@@ -161,14 +144,15 @@ export async function GET(req: NextRequest) {
           date: true,
           endDate: true,
           image: true,
-          createdAt: true
+          createdAt: true,
+          organizer: true
         },
         take: 8,
         orderBy: { date: 'asc' }
       })
     ]);
 
-    const total = articles.length + forums.length + users.length + categories.length + events.length;
+    const total = articles.length + forums.length + users.length + events.length;
 
     return NextResponse.json({
       success: true,
@@ -177,14 +161,12 @@ export async function GET(req: NextRequest) {
         articles,
         forums,
         users,
-        categories,
         events
       },
       counts: {
         articles: articles.length,
         forums: forums.length,
         users: users.length,
-        categories: categories.length,
         events: events.length
       },
       total

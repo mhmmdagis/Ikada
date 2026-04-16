@@ -28,19 +28,19 @@ export default function AdminNav() {
             <button
                 className={styles.menuToggle}
                 onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Toggle menu"
+                aria-label="Buka/Tutup menu"
             >
                 {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             <nav className={`${styles.nav} ${menuOpen ? styles.navOpen : ''}`}>
-                <Link href="/admin/users" onClick={() => setMenuOpen(false)}>Users</Link>
-                <Link href="/admin/articles" onClick={() => setMenuOpen(false)}>Articles</Link>
-                <Link href="/admin/forums" onClick={() => setMenuOpen(false)}>Forums</Link>
-                <Link href="/admin/comments" onClick={() => setMenuOpen(false)}>Comments</Link>
-                <Link href="/admin/categories" onClick={() => setMenuOpen(false)}>Categories</Link>
-                <Link href="/admin/events" onClick={() => setMenuOpen(false)}>Events</Link>
-                <Link href="/admin/galleries" onClick={() => setMenuOpen(false)}>Galleries</Link>
-                <Link href="/admin/programs" onClick={() => setMenuOpen(false)}>Programs</Link>
+                <Link href="/admin/users" onClick={() => setMenuOpen(false)}>Pengguna</Link>
+                <Link href="/admin/articles" onClick={() => setMenuOpen(false)}>Artikel</Link>
+                <Link href="/admin/forums" onClick={() => setMenuOpen(false)}>Berbagi Opini</Link>
+                <Link href="/admin/comments" onClick={() => setMenuOpen(false)}>Komentar</Link>
+                <Link href="/admin/categories" onClick={() => setMenuOpen(false)}>Kategori</Link>
+                <Link href="/admin/events" onClick={() => setMenuOpen(false)}>Acara</Link>
+                <Link href="/admin/galleries" onClick={() => setMenuOpen(false)}>Galeri</Link>
+                <Link href="/admin/programs" onClick={() => setMenuOpen(false)}>Program</Link>
                 <button 
                     onClick={() => {
                         setMenuOpen(false);
@@ -48,7 +48,7 @@ export default function AdminNav() {
                     }} 
                     className={styles.logoutBtn}
                 >
-                    <LogOut size={18} /> Logout
+                    <LogOut size={18} /> Keluar
                 </button>
             </nav>
         </header>

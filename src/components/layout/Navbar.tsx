@@ -41,7 +41,7 @@ export default function Navbar() {
         { name: 'Tentang', path: '/about', icon: <Users size={16} /> },
         { name: 'Program', path: '/program', icon: <Star size={16} /> },
         { name: 'Tulisan', path: '/writings', icon: <BookOpen size={16} /> },
-        { name: 'Diskusi', path: '/forums', icon: <MessageSquare size={16} /> },
+        { name: 'Berbagi Opini', path: '/forums', icon: <MessageSquare size={16} /> },
         { name: 'Event', path: '/events', icon: <Calendar size={16} /> },
         { name: 'Galeri', path: '/gallery', icon: <Image size={16} /> },
     ];
@@ -69,7 +69,7 @@ export default function Navbar() {
         document.documentElement.setAttribute('data-theme', saved);
 
         // Scroll listener
-        const onScroll = () => setScrolled(window.scrollY > 16);
+        const onScroll = () => setScrolled(window.scrollY > 40);
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
@@ -208,7 +208,7 @@ export default function Navbar() {
                                 type="text"
                                 value={searchQuery}
                                 onChange={e => handleSearchInput(e.target.value)}
-                                placeholder="Cari tulisan, diskusi, event..."
+                                placeholder="Cari tulisan, opini, event..."
                                 className={styles.searchInput}
                             />
                             <button type="button" onClick={() => setSearchOpen(false)} className={styles.searchClose}>
@@ -254,7 +254,7 @@ export default function Navbar() {
                                                 <div className={styles.resultContent}>
                                                     <div className={styles.resultTitle}>{forum.title}</div>
                                                     <div className={styles.resultMeta}>
-                                                        Diskusi • <AuthorLink href={`/profile/${forum.author.id}`} stopPropagation>{forum.author.name}</AuthorLink>
+                                                        Berbagi Opini • <AuthorLink href={`/profile/${forum.author.id}`} stopPropagation>{forum.author.name}</AuthorLink>
                                                     </div>
                                                 </div>
                                             </div>
@@ -279,21 +279,21 @@ export default function Navbar() {
 
                                         {/* Show all results link */}
                                         {(searchResults.counts.articles > 3 || searchResults.counts.forums > 3 ||
-                                          searchResults.counts.users > 2 || searchResults.counts.categories > 0 ||
-                                          searchResults.counts.events > 0) && (
-                                            <div
-                                                className={styles.searchShowAll}
-                                                onClick={() => {
-                                                    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-                                                    setSearchOpen(false);
-                                                    setSearchQuery('');
-                                                    setSearchResults(null);
-                                                }}
-                                            >
-                                                <ArrowRight size={16} />
-                                                <span>Lihat semua hasil ({searchResults.total})</span>
-                                            </div>
-                                        )}
+                                            searchResults.counts.users > 2 || searchResults.counts.categories > 0 ||
+                                            searchResults.counts.events > 0) && (
+                                                <div
+                                                    className={styles.searchShowAll}
+                                                    onClick={() => {
+                                                        router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                                                        setSearchOpen(false);
+                                                        setSearchQuery('');
+                                                        setSearchResults(null);
+                                                    }}
+                                                >
+                                                    <ArrowRight size={16} />
+                                                    <span>Lihat semua hasil ({searchResults.total})</span>
+                                                </div>
+                                            )}
                                     </>
                                 ) : (
                                     <div className={styles.searchEmpty}>
@@ -327,28 +327,46 @@ export default function Navbar() {
                             <Link
                                 key={link.path}
                                 href={link.path}
+                                title={link.name}
+                                aria-label={link.name}
                                 className={`${styles.navLink} ${pathname.startsWith(link.path) ? styles.active : ''}`}
                             >
                                 {link.icon}
-                                {link.name}
+                                <span>{link.name}</span>
                             </Link>
                         ))}
                     </nav>
 
                     {/* Right Actions */}
                     <div className={styles.actions}>
-                        <button className="icon-btn" onClick={() => setSearchOpen(true)} aria-label="Cari">
-                            <Search size={19} />
-                        </button>
-
-                        <button className="icon-btn" onClick={toggleTheme} aria-label="Ganti tema">
-                            {theme === 'light' ? <Moon size={19} /> : <Sun size={19} />}
-                        </button>
-
                         {user ? (
                             <>
-                                <Link href="/writings/new" className={`btn btn-primary btn-sm ${styles.hideOnMobile}`}>
-                                    <PenSquare size={15} /> Tulis
+                                <div className={styles.desktopControls}>
+                                    <button
+                                        className={`icon-btn ${styles.navIconBtn}`}
+                                        onClick={() => setSearchOpen(!searchOpen)}
+                                        aria-label="Search"
+                                    >
+                                        <Search size={20} />
+                                    </button>
+
+                                    <button
+                                        className={`icon-btn ${styles.navIconBtn}`}
+                                        onClick={toggleTheme}
+                                        aria-label="Toggle theme"
+                                    >
+                                        {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                                    </button>
+                                </div>
+
+                                {/* Tulis Button — desktop only, logged-in only */}
+                                <Link
+                                    href="/writings/new"
+                                    className={`btn btn-accent btn-sm ${styles.writeBtnNav}`}
+                                    aria-label="Buat tulisan baru"
+                                >
+                                    <PenSquare size={15} />
+                                    <span>Tulis</span>
                                 </Link>
 
                                 {/* User Dropdown */}
@@ -392,9 +410,29 @@ export default function Navbar() {
                                 </div>
                             </>
                         ) : (
-                            <div className={styles.authBtns}>
-                                <Link href="/login" className={`btn btn-ghost btn-sm ${styles.hideOnMobile}`}>Masuk</Link>
-                                <Link href="/register" className="btn btn-accent btn-sm">Daftar</Link>
+                            <div className={styles.navActions}>
+                                {/* Desktop-only Search & Theme */}
+                                <div className={styles.desktopControls}>
+                                    <button
+                                        className={`icon-btn ${styles.navIconBtn}`}
+                                        onClick={() => setSearchOpen(!searchOpen)}
+                                        aria-label="Search"
+                                    >
+                                        <Search size={18} />
+                                    </button>
+
+                                    <button
+                                        className={`icon-btn ${styles.navIconBtn}`}
+                                        onClick={toggleTheme}
+                                        aria-label="Toggle theme"
+                                    >
+                                        {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                                    </button>
+                                </div>
+                                <div className={styles.authBtns}>
+                                    <Link href="/login" className={styles.masukLink}>Masuk</Link>
+                                    <Link href="/register" className="btn btn-accent btn-sm">Daftar</Link>
+                                </div>
                             </div>
                         )}
 
@@ -412,6 +450,15 @@ export default function Navbar() {
                 {/* Mobile Menu */}
                 {menuOpen && (
                     <div className={styles.mobileMenu}>
+                        <div className={styles.mobileControls}>
+                            <button className={styles.mobileControlBtn} onClick={() => { setSearchOpen(true); setMenuOpen(false); }}>
+                                <Search size={20} /> Cari
+                            </button>
+                            <button className={styles.mobileControlBtn} onClick={toggleTheme}>
+                                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />} Tema
+                            </button>
+                        </div>
+
                         {navLinks.map(link => (
                             <Link
                                 key={link.path}

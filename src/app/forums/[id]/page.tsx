@@ -46,7 +46,7 @@ export default async function ForumDetailPage({ params }: Props) {
             <section className={styles.headerSection}>
                 <div className="container">
                     <Link href="/forums" className={styles.backLink}>
-                        <ArrowLeft size={16} /> Kembali ke Diskusi
+                        <ArrowLeft size={16} /> Kembali ke Berbagi Opini
                     </Link>
                     <div className={styles.titleWrapper}>
                         <h1>{forum.title}</h1>

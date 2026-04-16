@@ -5,11 +5,36 @@
 /* ============ HERO ============ */
 .hero {
     position: relative;
-    min-height: 88vh;
+    min-height: 90vh;
     display: flex;
     align-items: center;
-    padding: 6rem 0 5rem;
+    padding: 8rem 0 6rem;
     overflow: hidden;
+    /* Prevent blob leakage */
+}
+
+.heroContent {
+    flex: 1;
+    max-width: 700px;
+    z-index: 2;
+    position: relative;
+}
+
+.heroTitle {
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.04em;
+    font-weight: 900;
+}
+
+.heroSub {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 600px;
+    margin-bottom: 3rem;
+    font-weight: 500;
 }
 
 .heroBlob1 {
@@ -114,9 +139,48 @@
 }
 
 @keyframes pulseGlow {
-    0% { transform: scale(0.95); opacity: 0.5; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(0.95); opacity: 0.5; }
+    0% {
+        transform: scale(0.98);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(0.98);
+        opacity: 0.3;
+    }
+}
+
+.heroContent {
+    position: relative;
+    z-index: 5;
+}
+
+.sectionEyebrow {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brand-primary);
+    margin-bottom: 1rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.sectionEyebrow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 2px;
+    background: currentColor;
 }
 
 .heroTitle {
@@ -136,8 +200,7 @@
 .heroCta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.875rem;
-    margin-bottom: 2.5rem;
+    gap: 1.25rem;
 }
 
 .statsRow {
@@ -227,6 +290,7 @@
 
 .forumSection {
     background: var(--bg-secondary);
+    padding-top: clamp(2.5rem, 6vw, 4rem);
 }
 
 .sectionTop {
@@ -234,7 +298,8 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
+    /* Reduced from 2.5rem */
     flex-wrap: wrap;
 }
 
@@ -246,7 +311,7 @@
 .articleGrid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1rem;
 }
 
 @media (min-width: 900px) {
@@ -263,7 +328,7 @@
 }
 
 .featuredImgWrap {
-    height: 220px;
+    height: 140px;
     overflow: hidden;
 }
 
@@ -288,10 +353,10 @@
 }
 
 .featuredContent {
-    padding: 1.5rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.35rem;
     flex: 1;
 }
 
@@ -304,12 +369,13 @@
 
 .featuredExcerpt {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.65;
+    font-size: 0.85rem;
+    line-height: 1.5;
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 2;
+    /* Reduced from 3 */
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -324,17 +390,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
     text-decoration: none;
     flex: 1;
 }
 
 .miniTitle {
-    font-size: 0.975rem;
+    font-size: 0.875rem;
+    /* Reduced from 0.975rem */
     font-weight: 600;
     color: var(--text-primary);
-    line-height: 1.4;
+    line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -365,7 +432,9 @@
 .forumList {
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
+    gap: 0.75rem;
+    margin-top: 0 !important;
+    /* Ensure no top margin */
 }
 
 .forumRow {
@@ -410,11 +479,21 @@
 .ctaBox {
     position: relative;
     border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, rgba(46, 196, 182, .12), rgba(27, 154, 170, .1));
-    border: 1px solid rgba(46, 196, 182, .2);
-    padding: 4rem 2rem;
+    background: var(--gradient-main);
+    padding: 5rem 2rem;
     text-align: center;
     overflow: hidden;
+    color: white;
+}
+
+.ctaBox h2,
+.ctaBox p {
+    color: white !important;
+}
+
+.ctaDecor1,
+.ctaDecor2 {
+    opacity: 0.15;
 }
 
 .ctaDecor1 {
@@ -477,19 +556,26 @@
         text-align: center;
         gap: 2.5rem;
     }
-    
+
     .heroContent {
         max-width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-    
+
     .heroImageWrap {
         max-width: 320px;
         margin: 0 auto;
     }
+
+    .heroBlob1,
+    .heroBlob2 {
+        width: 300px;
+        height: 300px;
+    }
 }
+
 
 @media (max-width: 640px) {
     .hero {
@@ -500,29 +586,202 @@
     .featuredImgWrap {
         height: 160px;
     }
-    
+
     .heroImageWrap {
         max-width: 250px;
     }
 }
-/* New homepage sections */
-.intro, .vision, .program {
-    padding: 5rem 0;
+
+.intro,
+.vision,
+.program,
+.section {
+    padding: clamp(2rem, 5vw, 4rem) 0;
+    /* Reduced from clamp(4rem, 10vw, 8rem) */
     transition: background-color var(--ease-normal);
+    overflow: hidden;
+    /* Safeguard against pattern/divider leakage */
 }
 
 .intro {
-    background: var(--bg-primary);
+    padding: clamp(6rem, 15vw, 10rem) 0;
+    position: relative;
+    background-image: url('/intro-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+    overflow: hidden;
 }
 
-.intro p, .vision p, .program ul {
-    max-width: 720px;
-    line-height: 1.7;
+.intro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75));
+    z-index: 0;
+}
+
+.introGrid {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.introContent {
+    max-width: 850px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+@media (min-width: 1024px) {
+    .introGrid {
+        text-align: center;
+    }
+}
+
+.introTitle {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 2rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+.introBody {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.introText {
+    font-size: clamp(1.1rem, 2.2vw, 1.25rem);
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.vision,
+.program {
+    position: relative;
+}
+
+.vision {
+    background: var(--bg-tertiary);
+}
+
+.visionInner {
+    max-width: 850px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.visionTitle {
+    margin-bottom: 2rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.visionText {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: var(--text-primary);
+    line-height: 1.8;
+}
+
+/* ============ SECTION HEADER ============ */
+.sectionTop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Center-aligned for authority */
+    text-align: center;
+    margin-bottom: 0.625rem; /* Fine-tuned for the perfect gap */
+    gap: 0.4rem; /* Slightly tighter gap */
+}
+
+.sectionTop h2 {
+    margin-bottom: 0 !important;
+}
+
+.sectionTop>* {
+    margin-bottom: 0 !important;
+}
+
+.sectionTitleWrap {
+    max-width: 700px;
+}
+
+.sectionAction {
+    margin-top: 0.5rem;
+}
+
+@media (min-width: 900px) {
+    .sectionTop {
+        margin-bottom: 5rem;
+    }
+}
+
+/* ============ ARTICLE GRID ============ */
+.articleGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    max-width: 900px;
+    /* Further reduced from 1000px */
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .articleGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1100px) {
+    .articleGrid {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 2rem;
+    }
+}
+
+/* Featured Card refinement */
+.featuredCard {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+.featuredImgWrap {
+    height: 160px;
+    /* Further reduced from 200px */
+    width: 100%;
+}
+
+.featuredTitle {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    /* Further reduced from 1.75rem max */
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.featuredExcerpt {
+    font-size: 0.9375rem;
     color: var(--text-secondary);
-}
-
-.vision, .program {
-    background: var(--bg-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
 }
 
 /* ============ PROGRAM GRID ============ */
@@ -546,7 +805,7 @@
 .programCard:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
-    border-color: rgba(46, 196, 182,.25);
+    border-color: rgba(46, 196, 182, .25);
 }
 
 .programImageWrap {
@@ -574,7 +833,39 @@
 .programDesc {
     color: var(--text-secondary);
     line-height: 1.6;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9375rem;
+}
+
+/* ============ GEOMETRIC DIVIDER ============ */
+.dividerWrapper {
+    height: 80px;
+    /* Reduced from 120px */
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 5;
+    margin-top: -41px;
+    margin-bottom: -41px;
+    pointer-events: none;
+}
+
+.dividerGeometric {
+    width: 100%;
+    height: 100%;
+    display: block;
+    shape-rendering: geometricPrecision;
+    /* Use transform to slightly overscale and ensure no sub-pixel gaps */
+    transform: scale(1.01);
+}
+
+.dividerGeometric path {
+    fill: var(--bg-primary);
+    vector-effect: non-scaling-stroke;
+}
+
+.dividerSecondary path {
+    fill: var(--bg-secondary);
 }
 
 /* ============ GALLERY GRID ============ */

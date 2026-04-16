@@ -71,7 +71,7 @@ export default function AdminGalleriesPage() {
         const file = formData.get('file') as File;
 
         if (!file) {
-            alert('Please select a file');
+            alert('Silakan pilih file');
             return;
         }
 
@@ -107,7 +107,7 @@ export default function AdminGalleriesPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this gallery item?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus item galeri ini?')) return;
 
         try {
             const res = await fetch('/api/admin/galleries', {
@@ -130,17 +130,17 @@ export default function AdminGalleriesPage() {
     return (
         <div className={styles.container}>
             <Link href="/admin" className={styles.backBtn}>
-                <ArrowLeft size={20} /> Back to Admin
+                <ArrowLeft size={20} /> Kembali ke Admin
             </Link>
 
-            <h1 className={styles.title}>Manage Galleries</h1>
+            <h1 className={styles.title}>Kelola Galeri</h1>
 
             {/* Upload Form */}
             <div className={styles.section}>
-                <h2>Upload New Gallery Item</h2>
+                <h2>Unggah Item Galeri Baru</h2>
                 <form onSubmit={handleUpload} className={styles.form}>
                     <div className={styles.formGroup}>
-                        <label>Image/Video File *</label>
+                        <label>File Gambar/Video *</label>
                         <input
                             type="file"
                             name="file"
@@ -151,7 +151,7 @@ export default function AdminGalleriesPage() {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>Category</label>
+                        <label>Kategori</label>
                         <div className={styles.categoryInputGroup}>
                             <select
                                 value={selectedCategory}
@@ -161,7 +161,7 @@ export default function AdminGalleriesPage() {
                                 }}
                                 className={styles.input}
                             >
-                                <option value="">Select Category</option>
+                                <option value="">Pilih Kategori</option>
                                 {categories.map((cat) => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
@@ -175,18 +175,18 @@ export default function AdminGalleriesPage() {
                         className={styles.submitBtn}
                     >
                         {uploading ? <Loader size={18} /> : <Upload size={18} />}
-                        {uploading ? 'Uploading...' : 'Upload'}
+                        {uploading ? 'Mengunggah...' : 'Unggah'}
                     </button>
                 </form>
             </div>
 
             {/* Gallery List */}
             <div className={styles.section}>
-                <h2>Current Gallery Items ({galleries.length})</h2>
+                <h2>Item Galeri Saat Ini ({galleries.length})</h2>
                 {loading ? (
-                    <p>Loading galleries...</p>
+                    <p>Memuat galeri...</p>
                 ) : galleries.length === 0 ? (
-                    <p style={{ color: 'var(--text-secondary)' }}>No gallery items yet. Upload your first item above!</p>
+                    <p style={{ color: 'var(--text-secondary)' }}>Belum ada item galeri. Unggah item pertama Anda di atas!</p>
                 ) : (
                     <div className={styles.galleryGrid}>
                         {galleries.map((gallery) => (
@@ -213,7 +213,7 @@ export default function AdminGalleriesPage() {
                                         onClick={() => handleDelete(gallery.id)}
                                         className={styles.deleteBtn}
                                     >
-                                        <Trash2 size={16} /> Delete
+                                        <Trash2 size={16} /> Hapus
                                     </button>
                                 </div>
                             </div>

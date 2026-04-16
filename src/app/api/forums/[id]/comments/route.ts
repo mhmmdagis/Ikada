@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id: forumId } = await params;
 
     const forum = await prisma.forum.findUnique({ where: { id: forumId }, select: { id: true } });
-    if (!forum) return NextResponse.json({ error: 'Diskusi tidak ditemukan.' }, { status: 404 });
+    if (!forum) return NextResponse.json({ error: 'Opini tidak ditemukan.' }, { status: 404 });
 
     const comments = await prisma.comment.findMany({
         where: { forumId },

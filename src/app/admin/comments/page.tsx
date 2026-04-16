@@ -58,7 +58,7 @@ export default function CommentsPage() {
     }, [router]);
 
     const handleDelete = async (commentId: string) => {
-        if (!confirm('Are you sure you want to delete this comment?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus komentar ini?')) return;
 
         setDeleting(commentId);
         try {
@@ -86,17 +86,17 @@ export default function CommentsPage() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <Link href="/admin" className={styles.backBtn}>
-                    <ArrowLeft size={20} /> Back
+                    <ArrowLeft size={20} /> Kembali
                 </Link>
-                <h1>Manage Comments</h1>
+                <h1>Kelola Komentar</h1>
             </div>
 
             {loading ? (
-                <div className={styles.loading}>Loading...</div>
+                <div className={styles.loading}>Memuat...</div>
             ) : (
                 <div className={styles.commentsList}>
                     {comments.length === 0 ? (
-                        <p className={styles.empty}>No comments yet</p>
+                        <p className={styles.empty}>Belum ada komentar</p>
                     ) : (
                         comments.map(comment => (
                             <div key={comment.id} className={styles.commentCard}>
@@ -126,7 +126,7 @@ export default function CommentsPage() {
                                     </small>
                                     {comment.forum && (
                                         <small className={styles.parent}>
-                                            Forum: {comment.forum.title}
+                                            Opini: {comment.forum.title}
                                         </small>
                                     )}
                                     {comment.article && (
@@ -143,7 +143,7 @@ export default function CommentsPage() {
                 </div>
             )}
 
-            <p className={styles.info}>Total Comments: {comments.length}</p>
+            <p className={styles.info}>Total Komentar: {comments.length}</p>
         </div>
     );
 }

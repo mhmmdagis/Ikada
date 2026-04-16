@@ -143,13 +143,13 @@ export default function AdminProgramsPage() {
                     icon: '',
                     status: 'ACTIVE'
                 });
-                alert(editingId ? 'Program updated successfully!' : 'Program created successfully!');
+                alert(editingId ? 'Program berhasil diperbarui!' : 'Program berhasil dibuat!');
             } else {
-                alert('Failed to save program');
+                alert('Gagal menyimpan program');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error saving program');
+            alert('Terjadi kesalahan saat menyimpan program');
         } finally {
             setSubmitting(false);
         }
@@ -170,7 +170,7 @@ export default function AdminProgramsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this program?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus program ini?')) return;
 
         try {
             const res = await fetch('/api/admin/programs', {
@@ -180,13 +180,13 @@ export default function AdminProgramsPage() {
 
             if (res.ok) {
                 fetchPrograms();
-                alert('Program deleted successfully!');
+                alert('Program berhasil dihapus!');
             } else {
-                alert('Failed to delete program');
+                alert('Gagal menghapus program');
             }
         } catch (error) {
             console.error('Delete error:', error);
-            alert('Error deleting program');
+            alert('Terjadi kesalahan saat menghapus program');
         }
     };
 
@@ -207,26 +207,26 @@ export default function AdminProgramsPage() {
     return (
         <div className={styles.container}>
             <Link href="/admin" className={styles.backBtn}>
-                <ArrowLeft size={20} /> Back to Admin
+                <ArrowLeft size={20} /> Kembali ke Admin
             </Link>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 className={styles.title}>Manage Programs</h1>
+                <h1 className={styles.title}>Kelola Program</h1>
                 <button
                     onClick={() => setShowForm(!showForm)}
                     className={styles.primaryBtn}
                 >
-                    <Plus size={18} /> {showForm ? 'Cancel' : 'Add Program'}
+                    <Plus size={18} /> {showForm ? 'Batal' : 'Tambah Program'}
                 </button>
             </div>
 
             {/* Form */}
             {showForm && (
                 <div className={styles.section}>
-                    <h2>{editingId ? 'Edit Program' : 'Create New Program'}</h2>
+                    <h2>{editingId ? 'Edit Program' : 'Buat Program Baru'}</h2>
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <div className={styles.formGroup}>
-                            <label>Title *</label>
+                            <label>Judul *</label>
                             <input
                                 type="text"
                                 value={formData.title}
@@ -237,7 +237,7 @@ export default function AdminProgramsPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Description *</label>
+                            <label>Deskripsi *</label>
                             <textarea
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -247,7 +247,7 @@ export default function AdminProgramsPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label>Content (Long Description)</label>
+                            <label>Konten (Deskripsi Lengkap)</label>
                             <textarea
                                 value={formData.content}
                                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -258,7 +258,7 @@ export default function AdminProgramsPage() {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                             <div className={styles.formGroup}>
-                                <label>Category</label>
+                                <label>Kategori</label>
                                 <select
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -272,7 +272,7 @@ export default function AdminProgramsPage() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Icon/Emoji</label>
+                                <label>Ikon / Emoji</label>
                                 <input
                                     type="text"
                                     value={formData.icon}
@@ -290,9 +290,9 @@ export default function AdminProgramsPage() {
                                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                     className={styles.input}
                                 >
-                                    <option value="ACTIVE">Active</option>
-                                    <option value="INACTIVE">Inactive</option>
-                                    <option value="ARCHIVED">Archived</option>
+                                    <option value="ACTIVE">Aktif</option>
+                                    <option value="INACTIVE">Tidak Aktif</option>
+                                    <option value="ARCHIVED">Diarsipkan</option>
                                 </select>
                             </div>
                         </div>
@@ -359,14 +359,14 @@ export default function AdminProgramsPage() {
                                 className={styles.submitBtn}
                             >
                                 {submitting ? <Loader size={18} /> : '+'}
-                                {submitting ? 'Saving...' : editingId ? 'Update Program' : 'Create Program'}
+                                {submitting ? 'Menyimpan...' : editingId ? 'Perbarui Program' : 'Buat Program'}
                             </button>
                             <button
                                 type="button"
                                 onClick={cancelEdit}
                                 className={styles.cancelBtn}
                             >
-                                Cancel
+                                Batal
                             </button>
                         </div>
                     </form>
@@ -375,11 +375,11 @@ export default function AdminProgramsPage() {
 
             {/* Programs List */}
             <div className={styles.section}>
-                <h2>Programs ({programs.length})</h2>
+                <h2>Program ({programs.length})</h2>
                 {loading ? (
-                    <p>Loading programs...</p>
+                    <p>Memuat program...</p>
                 ) : programs.length === 0 ? (
-                    <p style={{ color: 'var(--text-secondary)' }}>No programs yet. Create your first program above!</p>
+                    <p style={{ color: 'var(--text-secondary)' }}>Belum ada program. Buat program pertama Anda di atas!</p>
                 ) : (
                     <div className={styles.list}>
                         {programs.map((program) => (

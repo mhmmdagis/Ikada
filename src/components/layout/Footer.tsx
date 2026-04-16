@@ -12,10 +12,10 @@ export default function Footer() {
                 {/* Brand Section */}
                 <div className={styles.brandSection}>
                     <Link href="/" className={styles.brand}>
-                        <span className="text-gradient">Disada</span> (Diskusi bareng IKADA)
+                        <span className="text-gradient">Disada</span> (Berbagi Opini bareng IKADA)
                     </Link>
                     <p className={styles.description}>
-                        Platform tulisan, forum diskusi dan info event paling relevan untuk IKADA. Berbagi pandangan, temukan inspirasi, dan perkuat silaturahmi.
+                        Platform tulisan, ruang berbagi opini dan info event paling relevan untuk IKADA. Berbagi pandangan, temukan inspirasi, dan perkuat silaturahmi.
                     </p>
                     <div className={styles.socials}>
                         <a href="https://www.instagram.com/ikada.jabodetabekbanten/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -80,7 +80,7 @@ export default function Footer() {
 
             <div className={styles.footerBottom}>
                 <div className="container">
-                    <p>&copy; {currentYear} Disada (Diskusi bareng IKADA). All rights reserved.</p>
+                    <p>&copy; {currentYear} Disada (Berbagi Opini bareng IKADA). All rights reserved.</p>
                 </div>
             </div>
         </footer>

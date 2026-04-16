@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import LoadingBar from "@/components/layout/LoadingBar";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Disada - Diskusi Bareng Ikada",
-  description: "Platform diskusi modern, ruang tulisan dan forum edukatif untuk remaja dan profesional.",
-  keywords: "diskusi, disada, ikada, artikel, opini, komunitas",
+  title: "Disada - Berbagi Opini Bareng Ikada",
+  description: "Platform berbagi opini modern, ruang tulisan dan forum edukatif untuk remaja dan profesional.",
+  keywords: "opini, disada, ikada, artikel, diskusi, komunitas",
 };
 
 export default function RootLayout({
@@ -15,10 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body>
+    <html lang="id" data-scroll-behavior="smooth">
+      <body suppressHydrationWarning>
+        <Suspense fallback={null}>
+          <LoadingBar />
+        </Suspense>
         <Navbar />
-        <main className="main-content">
+        <main className="main-content animate-fade-in">
           {children}
         </main>
         <Footer />

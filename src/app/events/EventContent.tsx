@@ -31,9 +31,7 @@ export default function EventContent({ events }: EventContentProps) {
         <div className={styles.pageContainer}>
             <section className={styles.headerSection}>
                 <div className="container">
-                    <Link href="/" className={styles.backLink}>
-                        <ArrowLeft size={16} /> Kembali ke Beranda
-                    </Link>
+
                     <div className={styles.titleWrapper}>
                         <h1>Jejak <span className="text-gradient">Karya</span></h1>
                         <p>Temukan acara, webinar, dan kompetisi terbaik untuk mengembangkan potensimu.</p>

@@ -44,7 +44,7 @@ export default function NewForumPage() {
             });
             const data = await res.json();
             if (!res.ok) {
-                setError(data.error || 'Gagal membuat diskusi baru.');
+                setError(data.error || 'Gagal mengirim opini baru.');
                 return;
             }
             router.push(`/forums/${data.id}`);
@@ -60,12 +60,12 @@ export default function NewForumPage() {
             <section className={styles.headerSection}>
                 <div className="container">
                     <Link href="/forums" className={styles.backLink}>
-                        <ArrowLeft size={16} /> Kembali ke Diskusi
+                        <ArrowLeft size={16} /> Kembali ke Berbagi Opini
                     </Link>
                     <div className={styles.titleWrapper}>
-                        <h1>Buat Diskusi Baru</h1>
+                        <h1>Bagikan Opinimu</h1>
                         <p className={styles.subtitle}>
-                            Tulis pertanyaan, opini, atau topik yang ingin kamu diskusikan bersama komunitas.
+                            Tulis pertanyaan, opini, atau topik yang ingin kamu bagikan bersama komunitas.
                         </p>
                     </div>
                 </div>
@@ -81,7 +81,7 @@ export default function NewForumPage() {
                         )}
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="forum-title">Judul Diskusi *</label>
+                            <label className="form-label" htmlFor="forum-title">Judul Opini *</label>
                             <input
                                 id="forum-title"
                                 type="text"
@@ -96,12 +96,12 @@ export default function NewForumPage() {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="forum-content">Isi Diskusi *</label>
+                            <label className="form-label" htmlFor="forum-content">Isi Opini *</label>
                             <textarea
                                 id="forum-content"
                                 className="form-textarea"
                                 rows={8}
-                                placeholder="Tulis detail topik, latar belakang, atau hal yang ingin kamu diskusikan..."
+                                placeholder="Tulis detail topik, latar belakang, atau hal yang ingin kamu bagikan..."
                                 value={content}
                                 onChange={e => setContent(e.target.value)}
                                 required
@@ -114,7 +114,7 @@ export default function NewForumPage() {
                                 className="btn btn-primary"
                                 disabled={loading}
                             >
-                                {loading ? 'Mengirim...' : 'Publikasikan Diskusi'}
+                                {loading ? 'Mengirim...' : 'Publikasikan Opinimu'}
                             </button>
                             <Link href="/forums" className="btn btn-ghost">
                                 Batal

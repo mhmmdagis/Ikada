@@ -42,31 +42,31 @@ export default function AdminActions({ userRole }: AdminActionsProps) {
 
     return (
         <section className={styles.quickActions}>
-            <h2>Quick Actions</h2>
+            <h2>Aksi Cepat</h2>
             <div className={styles.actiongrid}>
                 <Link href="/admin/users" className={styles.actionCard}>
-                    Manage Users
+                    Kelola Pengguna
                 </Link>
                 <Link href="/admin/articles" className={styles.actionCard}>
-                    Manage Articles
+                    Kelola Artikel
                 </Link>
                 <Link href="/admin/forums" className={styles.actionCard}>
-                    Manage Forums
+                    Kelola Berbagi Opini
                 </Link>
                 <Link href="/admin/comments" className={styles.actionCard}>
-                    Manage Comments
+                    Kelola Komentar
                 </Link>
                 <Link href="/admin/categories" className={styles.actionCard}>
-                    Manage Categories
+                    Kelola Kategori
                 </Link>
                 <Link href="/admin/events" className={styles.actionCard}>
-                    Manage Events
+                    Kelola Acara
                 </Link>
                 <Link href="/admin/galleries" className={styles.actionCard}>
-                    Manage Galleries
+                    Kelola Galeri
                 </Link>
                 <Link href="/admin/programs" className={styles.actionCard}>
-                    Manage Programs
+                    Kelola Program
                 </Link>
                 
                 {(userRole === 'ADMIN' || userRole === 'SUPER_ADMIN') && (
@@ -76,7 +76,7 @@ export default function AdminActions({ userRole }: AdminActionsProps) {
                         style={{ cursor: 'pointer' }}
                     >
                         <Download size={16} style={{ marginRight: '8px' }} />
-                        Export Data (XLSX)
+                        Ekspor Data (XLSX)
                     </div>
                 )}
             </div>

@@ -16,7 +16,7 @@ export default function AboutPage() {
 
             <section className={styles.card}>
                 <h2 className={styles.sectionTitle}>
-                    <Info size={24} /> Siapa Kami?
+                    <Info size={24} /> Profil IKADA JABODETABEK-BANTEN
                 </h2>
                 <div className={styles.content}>
                     <p className={styles.paragraph}>
@@ -30,7 +30,7 @@ export default function AboutPage() {
 
             <section className={styles.card}>
                 <h2 className={styles.sectionTitle}>
-                    <Target size={24} /> Landasan dan Tujuan Mulia Kami
+                    <Target size={24} /> Landasan dan Tujuan
                 </h2>
                 <p className={styles.paragraph}>
                     Berlandaskan Pancasila, UUD 1945, Al-Qur&apos;an, Hadits, serta Anggaran Dasar organisasi, IKADA memiliki tujuan yang jelas dan mulia:
@@ -59,7 +59,7 @@ export default function AboutPage() {
 
             <section className={styles.card}>
                 <h2 className={styles.sectionTitle}>
-                    <MapPin size={24} /> Sekretariat Kami
+                    <MapPin size={24} /> Sekretariat
                 </h2>
                 <p className={styles.paragraph}>Anda dapat mengunjungi kami di:</p>
                 <div className={styles.addressBox}>

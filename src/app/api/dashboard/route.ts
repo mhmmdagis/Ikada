@@ -248,7 +248,7 @@ export async function GET(req: NextRequest) {
       ...recentComments.map(item => ({
         id: `comment-${item.id}`,
         type: 'comment' as const,
-        title: item.article ? `Komentar di "${item.article.title}"` : `Komentar di diskusi`,
+        title: item.article ? `Komentar di "${item.article.title}"` : `Komentar di opini`,
         description: item.content.substring(0, 100) + (item.content.length > 100 ? '...' : ''),
         createdAt: item.createdAt,
         date: item.createdAt,

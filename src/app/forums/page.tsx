@@ -30,21 +30,19 @@ export default async function ForumsPage() {
         <div className={styles.pageContainer}>
             <section className={styles.headerSection}>
                 <div className="container">
-                    <Link href="/" className={styles.backLink}>
-                        <ArrowLeft size={16} /> Kembali ke Beranda
-                    </Link>
+
                     <div className={styles.headerContent}>
                         <div className={styles.titleWrapper}>
-                            <h1>Ruang <span className="text-gradient">Diskusi</span></h1>
+                            <h1>Ruang <span className="text-gradient">Berbagi Opini</span></h1>
                             <p>Bertukar pikiran, bagikan opinimu, dan temukan perspektif baru bersama komunitas Disada.</p>
                         </div>
                         {isLoggedIn ? (
                             <Link href="/forums/new" className="btn btn-primary">
-                                <Plus size={18} /> Buat Diskusi Baru
+                                <Plus size={18} /> Bagikan Opinimu
                             </Link>
                         ) : (
                             <Link href="/login?next=/forums" className="btn btn-outline">
-                                Masuk untuk Buat Diskusi
+                                Masuk untuk Berbagi Opini
                             </Link>
                         )}
                     </div>
@@ -81,12 +79,12 @@ export default async function ForumsPage() {
                         ) : (
                             <div className={styles.emptyState}>
                                 <MessageSquare size={48} className={styles.emptyIcon} />
-                                <h3>Belum ada diskusi</h3>
+                                <h3>Belum ada opini</h3>
                                 <p>Jadilah yang pertama untuk memulai percakapan menarik.</p>
                                 {isLoggedIn ? (
                                     <Link href="/forums/new" className="btn btn-outline">Buat Topik Baru</Link>
                                 ) : (
-                                    <Link href="/login?next=/forums" className="btn btn-outline">Masuk untuk Buat Diskusi</Link>
+                                    <Link href="/login?next=/forums" className="btn btn-outline">Masuk untuk Berbagi Opini</Link>
                                 )}
                             </div>
                         )}

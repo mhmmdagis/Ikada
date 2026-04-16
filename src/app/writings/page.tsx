@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import ArticleAuthor from '@/components/ArticleAuthor';
-import { Search, BookOpen, Plus, ArrowRight } from 'lucide-react';
+import { Search, BookOpen, Plus, ArrowRight, Hash, Filter } from 'lucide-react';
+import CategoryDropdown from '@/components/CategoryDropdown';
 import prisma from '@/lib/prisma';
 import { unstable_noStore as noStore } from 'next/cache';
 import { format } from 'date-fns';
@@ -46,18 +47,8 @@ export default async function WritingsPage({ searchParams }: { searchParams: Pro
                         </Link>
                     </div>
 
-                    {/* Category Filter */}
-                    <div className={styles.catFilter}>
-                        <Link href="/writings" className={`${styles.catBtn} ${!cat ? styles.catActive : ''}`}>
-                            Semua
-                        </Link>
-                        {categories.map(c => (
-                            <Link key={c.id} href={`/writings?cat=${c.slug}`}
-                                className={`${styles.catBtn} ${cat === c.slug ? styles.catActive : ''}`}>
-                                {c.name}
-                            </Link>
-                        ))}
-                    </div>
+                    {/* Category Filter Dropdown */}
+                    <CategoryDropdown categories={categories} activeCat={cat} />
                 </div>
             </section>
 

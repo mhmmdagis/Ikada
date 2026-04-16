@@ -190,7 +190,7 @@ export default function CategoriesPage() {
     };
 
     const handleDeleteGalleryCategory = async (id: string, name: string) => {
-        if (!confirm(`Delete gallery category "${name}"?`)) return;
+        if (!confirm(`Hapus kategori galeri "${name}"?`)) return;
 
         setGalleryDeleting(id);
         try {
@@ -240,7 +240,7 @@ export default function CategoriesPage() {
     };
 
     const handleDelete = async (categoryId: string) => {
-        if (!confirm('Delete this category?')) return;
+        if (!confirm('Hapus kategori ini?')) return;
 
         setDeleting(categoryId);
         try {
@@ -268,15 +268,15 @@ export default function CategoriesPage() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <Link href="/admin" className={styles.backBtn}>
-                    <ArrowLeft size={20} /> Back
+                    <ArrowLeft size={20} /> Kembali
                 </Link>
-                <h1>Manage Categories</h1>
+                <h1>Kelola Kategori</h1>
             </div>
 
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-                Article Categories
+                Kategori Artikel & Opini
                 <br />
-                Gunakan kategori ini saat mengupload tulisan/artikel di halaman tulisan.
+                Gunakan kategori ini saat mengunggah tulisan/artikel atau membuat opini baru.
             </p>
 
             {error && (
@@ -291,17 +291,17 @@ export default function CategoriesPage() {
                     style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     className="btn btn-primary"
                 >
-                    <Plus size={18} /> Add New Category
+                    <Plus size={18} /> Tambah Kategori Baru
                 </button>
             ) : (
                 <form onSubmit={handleCreate} style={{ marginBottom: '1.5rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                     <div className="form-group">
-                        <label className="form-label" htmlFor="cat-name">Category Name *</label>
+                        <label className="form-label" htmlFor="cat-name">Nama Kategori *</label>
                         <input
                             id="cat-name"
                             type="text"
                             className="form-input"
-                            placeholder="e.g., Programming"
+                            placeholder="Contoh: Pemrograman"
                             value={form.name}
                             onChange={e => setForm({ ...form, name: e.target.value })}
                             required
@@ -321,7 +321,7 @@ export default function CategoriesPage() {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label" htmlFor="cat-color">Color</label>
+                        <label className="form-label" htmlFor="cat-color">Warna</label>
                         <input
                             id="cat-color"
                             type="color"
@@ -333,10 +333,10 @@ export default function CategoriesPage() {
 
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                         <button type="submit" className="btn btn-primary" disabled={creating}>
-                            {creating ? 'Creating...' : 'Create Category'}
+                            {creating ? 'Menyimpan...' : 'Buat Kategori'}
                         </button>
                         <button type="button" onClick={() => setShowForm(false)} className="btn btn-ghost">
-                            Cancel
+                            Batal
                         </button>
                     </div>
                 </form>
@@ -347,10 +347,10 @@ export default function CategoriesPage() {
             ) : (
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
-                        <div className={styles.colName}>Name</div>
+                        <div className={styles.colName}>Nama</div>
                         <div className={styles.colEmail}>Slug</div>
-                        <div className={styles.colRole}>Color</div>
-                        <div className={styles.colAction}>Action</div>
+                        <div className={styles.colRole}>Warna</div>
+                        <div className={styles.colAction}>Aksi</div>
                     </div>
 
                     <div className={styles.tableBody}>
@@ -397,12 +397,12 @@ export default function CategoriesPage() {
                     style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     className="btn btn-primary"
                 >
-                    <Plus size={18} /> Add Gallery Category
+                    <Plus size={18} /> Tambah Kategori Galeri
                 </button>
             ) : (
                 <form onSubmit={handleCreateGalleryCategory} style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                     <div className={styles.formGroup}>
-                        <label>Category Name *</label>
+                        <label>Nama Kategori *</label>
                         <input
                             type="text"
                             className={styles.input}
@@ -425,7 +425,7 @@ export default function CategoriesPage() {
                     </div>
 
                     <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
-                        <label>Color</label>
+                        <label>Warna</label>
                         <input
                             type="color"
                             value={galleryForm.color}
@@ -436,10 +436,10 @@ export default function CategoriesPage() {
 
                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
                         <button type="submit" className={styles.primaryBtn} disabled={galleryCreating}>
-                            {galleryCreating ? 'Creating...' : 'Create Category'}
+                            {galleryCreating ? 'Menyimpan...' : 'Buat Kategori'}
                         </button>
                         <button type="button" onClick={() => setShowGalleryForm(false)} className={styles.cancelBtn}>
-                            Cancel
+                            Batal
                         </button>
                     </div>
                 </form>
@@ -501,12 +501,12 @@ export default function CategoriesPage() {
                     style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     className="btn btn-primary"
                 >
-                    <Plus size={18} /> Add Program Category
+                    <Plus size={18} /> Tambah Kategori Program
                 </button>
             ) : (
                 <form onSubmit={handleCreateProgramCategory} style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                     <div className={styles.formGroup}>
-                        <label>Category Name *</label>
+                        <label>Nama Kategori *</label>
                         <input
                             type="text"
                             className={styles.input}
@@ -529,7 +529,7 @@ export default function CategoriesPage() {
                     </div>
 
                     <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
-                        <label>Color</label>
+                        <label>Warna</label>
                         <input
                             type="color"
                             value={programForm.color}
@@ -540,10 +540,10 @@ export default function CategoriesPage() {
 
                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
                         <button type="submit" className={styles.primaryBtn} disabled={programCreating}>
-                            {programCreating ? 'Creating...' : 'Create Category'}
+                            {programCreating ? 'Menyimpan...' : 'Buat Kategori'}
                         </button>
                         <button type="button" onClick={() => setShowProgramForm(false)} className={styles.cancelBtn}>
-                            Cancel
+                            Batal
                         </button>
                     </div>
                 </form>

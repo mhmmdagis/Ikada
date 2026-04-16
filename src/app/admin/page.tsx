@@ -59,7 +59,7 @@ export default async function AdminDashboard() {
             <main className={styles.main}>
                 <div className={styles.titleSection}>
                     <h1>Dashboard Admin</h1>
-                    <p>Welcome back! Berikut ringkasan performa platform saat ini.</p>
+                    <p>Selamat datang kembali! Berikut ringkasan performa platform saat ini.</p>
                 </div>
 
                 <div className={styles.statsGrid}>
@@ -81,7 +81,7 @@ export default async function AdminDashboard() {
                             <h3>Artikel</h3>
                             <p className={styles.statValue}>{stats.articles}</p>
                             <small>
-                                {stats.publishedArticles} terbit, {stats.unpublishedArticles} draft
+                                {stats.publishedArticles} terbit, {stats.unpublishedArticles} konsep/draft
                             </small>
                         </div>
                     </Link>
@@ -91,7 +91,7 @@ export default async function AdminDashboard() {
                             <Zap size={32} color="white" />
                         </div>
                         <div className={styles.statContent}>
-                            <h3>Diskusi Forum</h3>
+                            <h3>Berbagi Opini</h3>
                             <p className={styles.statValue}>{stats.forums}</p>
                         </div>
                     </Link>
