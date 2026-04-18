@@ -609,7 +609,7 @@
     background-image: url('/intro-bg.jpg');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    /* background-attachment: fixed; Removed - tidak support di iOS Safari */
     color: white;
     overflow: hidden;
 }
@@ -620,6 +620,13 @@
     inset: 0;
     background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75));
     z-index: 0;
+}
+
+/* Desktop only - background parallax effect */
+@media (min-width: 1024px) {
+    .intro {
+        background-attachment: fixed;
+    }
 }
 
 .introGrid {
