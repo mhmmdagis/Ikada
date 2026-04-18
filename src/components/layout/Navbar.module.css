@@ -426,6 +426,8 @@
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     will-change: transform;
+    /* Pastikan above everything */
+    pointer-events: auto;
 }
 
 .mobileControls {

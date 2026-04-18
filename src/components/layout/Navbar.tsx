@@ -457,56 +457,56 @@ export default function Navbar() {
                         </button>
                     </div>
                 </div>
-
-                {/* Mobile Menu */}
-                {menuOpen && (
-                    <div className={styles.mobileMenu}>
-                        <div className={styles.mobileControls}>
-                            <button className={styles.mobileControlBtn} onClick={() => { setSearchOpen(true); setMenuOpen(false); }}>
-                                <Search size={20} /> Cari
-                            </button>
-                            <button className={styles.mobileControlBtn} onClick={toggleTheme}>
-                                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />} Tema
-                            </button>
-                        </div>
-
-                        {navLinks.map(link => (
-                            <Link
-                                key={link.path}
-                                href={link.path}
-                                className={`${styles.mobileLink} ${pathname.startsWith(link.path) ? styles.mobileActive : ''}`}
-                                onClick={() => setMenuOpen(false)}
-                            >
-                                {link.icon} {link.name}
-                            </Link>
-                        ))}
-                        <hr className="divider" />
-                        {user ? (
-                            <>
-                                <Link href={`/profile/${user.id}`} className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                                    <User size={16} /> Profil Saya
-                                </Link>
-                                <Link href="/writings/new" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                                    <PenSquare size={16} /> Buat Tulisan
-                                </Link>
-                                {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
-                                    <Link href="/admin" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-                                        <Settings size={16} /> Admin Panel
-                                    </Link>
-                                )}
-                                <button className={`${styles.mobileLink} ${styles.mobileLogout}`} onClick={handleLogout}>
-                                    <LogOut size={16} /> Keluar
-                                </button>
-                            </>
-                        ) : (
-                            <div className={styles.mobileAuthBtns}>
-                                <Link href="/login" className="btn btn-ghost" onClick={() => setMenuOpen(false)}>Masuk</Link>
-                                <Link href="/register" className="btn btn-accent" onClick={() => setMenuOpen(false)}>Daftar</Link>
-                            </div>
-                        )}
-                    </div>
-                )}
             </header>
+
+            {/* Mobile Menu - OUTSIDE header untuk avoid z-index stacking context */}
+            {menuOpen && (
+                <div className={styles.mobileMenu}>
+                    <div className={styles.mobileControls}>
+                        <button className={styles.mobileControlBtn} onClick={() => { setSearchOpen(true); setMenuOpen(false); }}>
+                            <Search size={20} /> Cari
+                        </button>
+                        <button className={styles.mobileControlBtn} onClick={toggleTheme}>
+                            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />} Tema
+                        </button>
+                    </div>
+
+                    {navLinks.map(link => (
+                        <Link
+                            key={link.path}
+                            href={link.path}
+                            className={`${styles.mobileLink} ${pathname.startsWith(link.path) ? styles.mobileActive : ''}`}
+                            onClick={() => setMenuOpen(false)}
+                        >
+                            {link.icon} {link.name}
+                        </Link>
+                    ))}
+                    <hr className="divider" />
+                    {user ? (
+                        <>
+                            <Link href={`/profile/${user.id}`} className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                                <User size={16} /> Profil Saya
+                            </Link>
+                            <Link href="/writings/new" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                                <PenSquare size={16} /> Buat Tulisan
+                            </Link>
+                            {(user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') && (
+                                <Link href="/admin" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+                                    <Settings size={16} /> Admin Panel
+                                </Link>
+                            )}
+                            <button className={`${styles.mobileLink} ${styles.mobileLogout}`} onClick={handleLogout}>
+                                <LogOut size={16} /> Keluar
+                            </button>
+                        </>
+                    ) : (
+                        <div className={styles.mobileAuthBtns}>
+                            <Link href="/login" className="btn btn-ghost" onClick={() => setMenuOpen(false)}>Masuk</Link>
+                            <Link href="/register" className="btn btn-accent" onClick={() => setMenuOpen(false)}>Daftar</Link>
+                        </div>
+                    )}
+                </div>
+            )}
         </>
     );
 }
