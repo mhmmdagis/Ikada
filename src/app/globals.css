@@ -133,8 +133,12 @@ select {
   border-radius: 0;
 }
 
-/* Hide callout menu on long press */
--webkit-touch-callout: none;
+/* Hide callout menu on long press & prevent text selection */
+html {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /* Prevent text selection on buttons/interactive elements */
 button,
