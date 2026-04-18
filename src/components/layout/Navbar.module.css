@@ -10,6 +10,12 @@
     -webkit-backdrop-filter: blur(12px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     transition: all var(--ease-normal);
+    /* Safe area untuk iOS notch */
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    /* iOS Safari z-index fix */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 [data-theme="dark"] .header {
@@ -242,6 +248,9 @@
 /* Avatar / Dropdown */
 .userDropdownWrap {
     position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 100;
 }
 
 .avatarBtn {
@@ -304,6 +313,10 @@
     padding: 0.75rem;
     animation: scaleIn 0.2s var(--ease-bounce) both;
     transform-origin: top right;
+    z-index: 101;
+    /* iOS Safari fix */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .dropdownHeader {
@@ -408,7 +421,11 @@
     flex-direction: column;
     gap: 0.5rem;
     overflow-y: auto;
-    z-index: 999;
+    z-index: 9999;
+    /* iOS Safari fix untuk z-index dengan fixed positioning */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
 }
 
 .mobileControls {
@@ -503,12 +520,16 @@
     inset: 0;
     background: rgba(0, 0, 0, .5);
     backdrop-filter: blur(6px);
-    z-index: 2000;
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 3000;
     display: flex;
     align-items: flex-start;
     justify-content: center;
     padding-top: 6rem;
     animation: fadeIn 0.2s ease both;
+    /* iOS Safari fix */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .searchModal {
@@ -543,6 +564,9 @@
     color: var(--text-primary);
     outline: none;
     font-family: 'Inter', sans-serif;
+    /* iOS input fix */
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .searchInput::placeholder {

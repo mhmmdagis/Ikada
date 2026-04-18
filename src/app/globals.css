@@ -7,6 +7,12 @@ html, body {
   overflow-x: hidden;
   position: relative;
   width: 100%;
+  height: 100%;
+}
+
+/* iOS Safari fix: Dynamic viewport height */
+html {
+  height: 100dvh;
 }
 
 :root {
@@ -114,6 +120,38 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* ============================================
+   iOS SAFARI SPECIFIC FIXES
+   ============================================ */
+/* Prevent input zoom on iOS */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* Hide callout menu on long press */
+-webkit-touch-callout: none;
+
+/* Prevent text selection on buttons/interactive elements */
+button,
+a {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Fix safe area for notch */
+@supports (constant(safe-area-inset-bottom)) {
+  body {
+    padding-left: constant(safe-area-inset-left);
+    padding-right: constant(safe-area-inset-right);
+    padding-bottom: constant(safe-area-inset-bottom);
+  }
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--bg-primary);
@@ -122,6 +160,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color var(--ease-normal), color var(--ease-normal);
+  min-height: 100dvh;
+  /* Fallback untuk browser yang tidak support 100dvh */
   min-height: 100vh;
 }
 
@@ -636,6 +676,7 @@ img {
    ============================================ */
 .main-content {
   padding-top: var(--nav-height);
+  min-height: calc(100dvh - var(--nav-height));
   min-height: calc(100vh - var(--nav-height));
 }
 

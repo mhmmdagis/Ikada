@@ -63,10 +63,16 @@ export default function Navbar() {
     }, [pathname]);
 
     useEffect(() => {
-        // Restore theme
-        const saved = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
-        setTheme(saved);
-        document.documentElement.setAttribute('data-theme', saved);
+        // Restore theme - safe localStorage for iOS private mode
+        try {
+            const saved = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
+            setTheme(saved);
+            document.documentElement.setAttribute('data-theme', saved);
+        } catch (e) {
+            // Fallback untuk private browsing mode di iOS
+            setTheme('light');
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
 
         // Scroll listener
         const onScroll = () => setScrolled(window.scrollY > 40);
@@ -101,7 +107,12 @@ export default function Navbar() {
         const next = theme === 'light' ? 'dark' : 'light';
         setTheme(next);
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
+        try {
+            localStorage.setItem('theme', next);
+        } catch (e) {
+            // Private mode di iOS - silently fail
+            console.warn('localStorage tidak tersedia (private mode)');
+        }
     };
 
     const handleLogout = async () => {

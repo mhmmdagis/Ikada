@@ -1,14 +1,31 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import LoadingBar from "@/components/layout/LoadingBar";
 import { Suspense } from "react";
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+};
+
 export const metadata: Metadata = {
   title: "Disada - Berbagi Opini Bareng Ikada",
   description: "Platform berbagi opini modern, ruang tulisan dan forum edukatif untuk remaja dan profesional.",
   keywords: "opini, disada, ikada, artikel, diskusi, komunitas",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Disada",
+  },
+  formatDetection: {
+    telephone: true,
+  },
 };
 
 export default function RootLayout({
