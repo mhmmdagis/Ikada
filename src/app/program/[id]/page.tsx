@@ -11,14 +11,21 @@ interface Props {
 export default async function ProgramDetailPage({ params }: Props) {
     const { id: programId } = await params;
 
-    const program = await prisma.program.findUnique({
-        where: { id: programId, status: 'ACTIVE' },
-        include: {
-            createdBy: {
-                select: { name: true, id: true },
+    let program = null;
+
+    try {
+        program = await prisma.program.findUnique({
+            where: { id: programId, status: 'ACTIVE' },
+            include: {
+                createdBy: {
+                    select: { name: true, id: true },
+                },
             },
-        },
-    });
+        });
+    } catch (error) {
+        console.error('Error fetching program:', error);
+        // Continue with notFound if database fails
+    }
 
     if (!program) {
         notFound();

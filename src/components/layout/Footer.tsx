@@ -12,7 +12,7 @@ export default function Footer() {
                 {/* Brand Section */}
                 <div className={styles.brandSection}>
                     <Link href="/" className={styles.brand}>
-                        <span className="text-gradient">Disada</span> (Berbagi Opini bareng IKADA)
+                        <span className="text-gradient">Disada</span> (Diskusi Bareng IKADA)
                     </Link>
                     <p className={styles.description}>
                         Platform tulisan, ruang berbagi opini dan info event paling relevan untuk IKADA. Berbagi pandangan, temukan inspirasi, dan perkuat silaturahmi.
@@ -80,7 +80,7 @@ export default function Footer() {
 
             <div className={styles.footerBottom}>
                 <div className="container">
-                    <p>&copy; {currentYear} Disada (Berbagi Opini bareng IKADA). All rights reserved.</p>
+                    <p>&copy; {currentYear} Disada (Diskusi Bareng IKADA). All rights reserved.</p>
                 </div>
             </div>
         </footer>

@@ -15,33 +15,59 @@ export const revalidate = 300; // revalidate every 5 minutes
 
 export default async function Home() {
   noStore();
-  const [articles, forums, galleryItems, programs, totalUsers] = await Promise.all([
-    prisma.article.findMany({
-      where: { published: true },
-      include: { author: true, category: true },
-      orderBy: { createdAt: 'desc' },
-      take: 4,
-    }),
-    prisma.forum.findMany({
-      include: { author: true, _count: { select: { comments: true } } },
-      orderBy: { updatedAt: 'desc' },
-      take: 3,
-    }),
-    prisma.galleryItem.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 6,
-      include: { uploadedBy: { select: { name: true } } }
-    }),
-    prisma.program.findMany({
-      where: { status: 'ACTIVE' },
-      orderBy: { createdAt: 'desc' },
-      take: 3,
-    }),
-    prisma.user.count(),
-  ]);
+  
+  // Fetch data with fallback empty arrays in case of database connection error
+  let articles = [];
+  let forums = [];
+  let galleryItems = [];
+  let programs = [];
+  let totalUsers = 0;
+  let totalArticles = 0;
+  let totalForums = 0;
 
-  const totalArticles = await prisma.article.count({ where: { published: true } });
-  const totalForums = await prisma.forum.count();
+  try {
+    const results = await Promise.allSettled([
+      prisma.article.findMany({
+        where: { published: true },
+        include: { author: true, category: true },
+        orderBy: { createdAt: 'desc' },
+        take: 4,
+      }),
+      prisma.forum.findMany({
+        include: { author: true, _count: { select: { comments: true } } },
+        orderBy: { updatedAt: 'desc' },
+        take: 3,
+      }),
+      prisma.galleryItem.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 6,
+        include: { uploadedBy: { select: { name: true } } }
+      }),
+      prisma.program.findMany({
+        where: { status: 'ACTIVE' },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+      }),
+      prisma.user.count(),
+    ]);
+
+    if (results[0].status === 'fulfilled') articles = results[0].value;
+    if (results[1].status === 'fulfilled') forums = results[1].value;
+    if (results[2].status === 'fulfilled') galleryItems = results[2].value;
+    if (results[3].status === 'fulfilled') programs = results[3].value;
+    if (results[4].status === 'fulfilled') totalUsers = results[4].value;
+
+    const countResults = await Promise.allSettled([
+      prisma.article.count({ where: { published: true } }),
+      prisma.forum.count(),
+    ]);
+
+    if (countResults[0].status === 'fulfilled') totalArticles = countResults[0].value;
+    if (countResults[1].status === 'fulfilled') totalForums = countResults[1].value;
+  } catch (error) {
+    console.error('Database connection error:', error);
+    // Continue with empty arrays
+  }
 
   return (
     <div className={styles.page}>
@@ -71,8 +97,8 @@ export default async function Home() {
 
               <ScrollReveal animation="fade-up" delay={200}>
                 <p className={styles.heroSub}>
-                  Platform resmi Disada (Berbagi Opini Bareng IKADA) Jabodetabek-Banten.
-                  Wadah kolaborasi, inovasi, dan silaturahmi alumni untuk masa depan gemilang.
+                  Platform resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten.
+                  Wadah kolaborasi, inovasi, dan silaturahmi alumni <span className="text-gradient" style={{fontWeight: 'bold'}}>Pondok Pesantren Darussalam</span> untuk masa depan gemilang.
                 </p>
               </ScrollReveal>
 

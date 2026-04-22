@@ -15,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Disada - Berbagi Opini Bareng Ikada",
-  description: "Platform berbagi opini modern, ruang tulisan dan forum edukatif untuk remaja dan profesional.",
+  title: "Disada - Diskusi Bareng IKADA",
+  description: "Platform resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten. Wadah kolaborasi, inovasi, dan silaturahmi alumni Pondok Pesantren Darussalam.",
   keywords: "opini, disada, ikada, artikel, diskusi, komunitas",
   appleWebApp: {
     capable: true,
