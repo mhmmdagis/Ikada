@@ -17,13 +17,13 @@ export default async function Home() {
   noStore();
   
   // Fetch data with fallback empty arrays in case of database connection error
-  let articles = [];
-  let forums = [];
-  let galleryItems = [];
-  let programs = [];
-  let totalUsers = 0;
-  let totalArticles = 0;
-  let totalForums = 0;
+  let articles: any[] = [];
+  let forums: any[] = [];
+  let galleryItems: any[] = [];
+  let programs: any[] = [];
+  let totalUsers: number = 0;
+  let totalArticles: number = 0;
+  let totalForums: number = 0;
 
   try {
     const results = await Promise.allSettled([
