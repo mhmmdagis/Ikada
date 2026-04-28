@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Disada - Diskusi Bareng IKADA",
-  description: "Platform resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten. Wadah kolaborasi, inovasi, dan silaturahmi alumni Pondok Pesantren Darussalam.",
+  description: "nilai dan kenangan tetap menautkan harapan yang sama. Platform ini hadir sebagai ruang temu alumni Pondok Pesantren Darussalam, tempat silaturahmi bertransformasi menjadi kekuatan kolaborasi dan inovasi, menyalakan langkah bersama menuju masa depan yang lebih gemilang.",
   keywords: "opini, disada, ikada, artikel, diskusi, komunitas",
   appleWebApp: {
     capable: true,

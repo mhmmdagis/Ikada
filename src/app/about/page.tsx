@@ -3,7 +3,7 @@ import styles from './about.module.css';
 import { Info, Target, Users, MapPin } from 'lucide-react';
 
 export default function AboutPage() {
-    return (
+    return ( 
         <div className={styles.container}>
             <div className={styles.hero}>
                 <h1 className={styles.heroTitle}>

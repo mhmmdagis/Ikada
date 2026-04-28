@@ -97,8 +97,7 @@ export default async function Home() {
 
               <ScrollReveal animation="fade-up" delay={200}>
                 <p className={styles.heroSub}>
-                  Platform resmi Disada (Diskusi Bareng IKADA) Jabodetabek-Banten.
-                  Wadah kolaborasi, inovasi, dan silaturahmi alumni <span className="text-gradient" style={{fontWeight: 'bold'}}>Pondok Pesantren Darussalam</span> untuk masa depan gemilang.
+                  nilai dan kenangan tetap menautkan harapan yang sama. Platform ini hadir sebagai ruang temu alumni <span className="text-gradient" style={{fontWeight: 'bold'}}>Pondok Pesantren Darussalam</span>, tempat silaturahmi bertransformasi menjadi kekuatan kolaborasi dan inovasi, menyalakan langkah bersama menuju masa depan yang lebih gemilang.
                 </p>
               </ScrollReveal>
 
