@@ -86,8 +86,8 @@ export default async function DashboardPage() {
         ]) : Promise.all([
             prisma.article.count({ where: { authorId: session.userId } }),
             prisma.forum.count({ where: { authorId: session.userId } }),
-            prisma.comment.count({ where: { authorId: session.userId } }),
             prisma.user.count(),
+            prisma.comment.count({ where: { authorId: session.userId } }),
             prisma.event.count(),
             prisma.galleryItem.count()
         ])
