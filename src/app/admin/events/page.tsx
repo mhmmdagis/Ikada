@@ -121,10 +121,15 @@ export default function EventsPage() {
         setCreating(true);
 
         try {
+            const payload = {
+                ...form,
+                date: new Date(form.date).toISOString(),
+                endDate: form.endDate ? new Date(form.endDate).toISOString() : null,
+            };
             const res = await fetch('/api/admin/events', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify(payload),
             });
 
             const data = await res.json();
@@ -149,8 +154,8 @@ export default function EventsPage() {
             title: event.title,
             description: event.description,
             content: event.content || '',
-            date: new Date(event.date).toISOString().slice(0, 16),
-            endDate: event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : '',
+            date: format(new Date(event.date), "yyyy-MM-dd'T'HH:mm"),
+            endDate: event.endDate ? format(new Date(event.endDate), "yyyy-MM-dd'T'HH:mm") : '',
             location: event.location,
             image: event.image || '',
             type: event.type,
@@ -174,10 +179,16 @@ export default function EventsPage() {
         setUpdating(true);
 
         try {
+            const payload = {
+                ...form,
+                eventId: editingEvent.id,
+                date: new Date(form.date).toISOString(),
+                endDate: form.endDate ? new Date(form.endDate).toISOString() : null,
+            };
             const res = await fetch('/api/admin/events', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...form, eventId: editingEvent.id }),
+                body: JSON.stringify(payload),
             });
 
             const data = await res.json();
