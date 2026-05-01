@@ -1,29 +1,49 @@
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
-    console.log('📧 Attempting to send email via Brevo...', { to, subject });
-    
+    if (!process.env.BREVO_API_KEY) {
+      console.error('❌ Missing BREVO_API_KEY environment variable. Aborting email send.');
+      return { success: false, error: { message: 'Missing BREVO_API_KEY' } };
+    }
+
+    const fromEmail = process.env.FROM_EMAIL || 'noreply@disada.com';
+    console.log('📧 Attempting to send email via Brevo...', { to, subject, from: fromEmail });
+
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
-        'api-key': process.env.BREVO_API_KEY || '',
+        'api-key': process.env.BREVO_API_KEY,
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         sender: {
           name: 'Disada',
-          email: process.env.FROM_EMAIL || 'noreply@disada.com',
+          email: fromEmail,
         },
         to: [{ email: to }],
         subject,
         htmlContent: html,
+        // optional replyTo if configured
+        ...(process.env.REPLY_TO ? { replyTo: { email: process.env.REPLY_TO } } : {}),
       }),
     });
 
-    const data = await response.json();
+    // Parse response safely: prefer JSON, fall back to text
+    let data: any;
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = { parseError: 'Failed to parse JSON response', raw: await response.text() };
+      }
+    } else {
+      data = await response.text();
+    }
 
     if (!response.ok) {
-      console.error('❌ Brevo API error:', JSON.stringify(data, null, 2));
-      return { success: false, error: data };
+      console.error('❌ Brevo API error:', response.status, data);
+      return { success: false, error: { status: response.status, body: data } };
     }
 
     console.log('✅ Email sent successfully via Brevo!', { 

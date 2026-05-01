@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
 
         // Send verification email
         const emailHtml = generateVerificationEmailHtml(verificationToken);
+        console.log('Env check for email send:', { BREVO_API_KEY_set: !!process.env.BREVO_API_KEY, FROM_EMAIL: process.env.FROM_EMAIL || 'not-set' });
         const emailResult = await sendEmail(normalizedEmail, 'Verifikasi Email - Disada', emailHtml);
 
         if (!emailResult.success) {
